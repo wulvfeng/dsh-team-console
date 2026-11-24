@@ -1,0 +1,76 @@
+{
+  "name": "dsh-team-console",
+  "version": "0.9.4",
+  "description": "DSH Agent Teams 只读监控面板：左侧栏「团队」入口，自动展示成员状态、共享任务板，以及每个成员的会话流（消息 / 工具调用 / 结果）。Host 插件 + Web 客户端插件，随包发布。",
+  "license": "MIT",
+  "icon": "./icon.svg",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wulvlv666/dsh-team-console.git"
+  },
+  "homepage": "https://github.com/wulvlv666/dsh-team-console#readme",
+  "bugs": {
+    "url": "https://github.com/wulvlv666/dsh-team-console/issues"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./server": "./lib/server.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "public",
+    "locale",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "start.bat",
+    "install.mjs",
+    "icon.svg"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "dsh-bundle",
+    "deepseek-harness",
+    "agent-teams",
+    "dashboard",
+    "monitor",
+    "session"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-primitives"
+      ]
+    }
+  },
+  "engines": {
+    "node": ">=22.15.0",
+    "dsh": ">=0.1.5-rc.1"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-client-ui-primitives": ">=0.0.1-rc.1"
+  },
+  "devDependencies": {
+    "@deepseek-ai/dsh-client-ui-primitives": "0.0.1-rc.1"
+  },
+  "scripts": {
+    "check:syntax": "node --check lib/index.js && node --check lib/server.js && node --check lib/sessions.js && node --check lib/team.js && node --check lib/client.js && node --check public/app.js",
+    "start": "node lib/start.mjs",
+    "demo": "node tools/demo.mjs",
+    "test": "node test/smoke.mjs && node test/regression.mjs",
+    "build": "node tools/build-css.mjs",
+    "verify": "node tools/verify.mjs"
+  }
+}

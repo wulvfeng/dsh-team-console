@@ -1,0 +1,384 @@
+:root{color-scheme:light dark;--dtc-bg:#f6f7fb;--dtc-card:#fff;--dtc-card2:#f4f6fa;--dtc-card3:#e9edf5;--dtc-edge:#e3e7ef;--dtc-edge2:#cbd3e1;--dtc-text:#0f172a;--dtc-dim:#48566b;--dtc-dim2:#63718a;--dtc-brand:#4f46e5;--dtc-ok:#047857;--dtc-warn:#b45309;--dtc-bad:#dc2626;--dtc-hover:rgba(15,23,42,.045);--dtc-active:rgba(79,70,229,.09);--dtc-r:14px;--dtc-r-sm:10px;--dtc-shadow-sm:0 1px 2px rgba(15,23,42,.05),0 1px 3px rgba(15,23,42,.04);--dtc-shadow-md:0 12px 28px -12px rgba(15,23,42,.18),0 4px 10px -4px rgba(15,23,42,.08);--dtc-shadow-glow:0 0 0 1px rgba(79,70,229,.18),0 10px 24px -12px rgba(79,70,229,.45);--dtc-mono:ui-monospace,SFMono-Regular,Consolas,"Cascadia Code",monospace}
+:root{--dtc-bg:light-dark(#f6f7fb,#0a0e14);--dtc-card:light-dark(#ffffff,#121820);--dtc-card2:light-dark(#f4f6fa,#18202b);--dtc-card3:light-dark(#e9edf5,#212b38);--dtc-edge:light-dark(#e3e7ef,#263040);--dtc-edge2:light-dark(#cbd3e1,#38445a);--dtc-text:light-dark(#0f172a,#e6edf5);--dtc-dim:light-dark(#48566b,#9aa7b8);--dtc-dim2:light-dark(#63718a,#7c8a9c);--dtc-brand:light-dark(#4f46e5,#7d8bff);--dtc-ok:light-dark(#047857,#34d399);--dtc-warn:light-dark(#b45309,#fbbf24);--dtc-bad:light-dark(#dc2626,#fb7185);--dtc-hover:light-dark(rgba(15,23,42,.045),rgba(255,255,255,.055));--dtc-active:light-dark(rgba(79,70,229,.09),rgba(125,139,255,.14));--dtc-shadow-sm:0 1px 2px light-dark(rgba(15,23,42,.05),rgba(0,0,0,.5)),0 1px 3px light-dark(rgba(15,23,42,.04),rgba(0,0,0,.42));--dtc-shadow-md:0 12px 28px -12px light-dark(rgba(15,23,42,.18),rgba(0,0,0,.66)),0 4px 10px -4px light-dark(rgba(15,23,42,.08),rgba(0,0,0,.5));--dtc-shadow-glow:0 0 0 1px color-mix(in oklab,var(--dtc-brand) 18%,transparent),0 10px 24px -12px color-mix(in oklab,var(--dtc-brand) 45%,transparent)}
+html,body{height:100%;margin:0;background:light-dark(#f6f7fb,#080b10)}
+
+/* ============================================================================
+   dsh-team-console · 视觉系统 0.9.1
+   单一强调色 + 中性灰阶；层次靠「表面 / 描边 / 极轻阴影 / 留白」表达。
+   面板端继承 DSH 令牌（--dsw-alias-*）；独立端的 --dtc-* 由 tools/build-css.mjs 注入。
+   ========================================================================== */
+
+/* --- 1. 基础令牌与画布 --------------------------------------------------- */
+.dtc-root{container-type:inline-size;container-name:dtc;display:flex;flex-direction:column;height:100%;min-height:0;background:var(--dtc-bg);color:var(--dtc-text);font-family:var(--dsw-font-family,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif);font-size:13px;line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.dtc-root *{box-sizing:border-box}
+.dtc-root ::selection{background:color-mix(in oklab,var(--dtc-brand) 22%,transparent);color:var(--dtc-text)}
+.dtc-root :focus-visible{outline:2px solid color-mix(in oklab,var(--dtc-brand) 70%,transparent);outline-offset:2px}
+.dtc-root b,.dtc-root strong{font-weight:650}
+
+/* --- 2. 顶栏 ------------------------------------------------------------- */
+.dtc-top{display:flex;align-items:center;gap:12px;padding:0 16px;height:52px;flex:none;position:relative;z-index:10;border-bottom:1px solid var(--dtc-edge);background:color-mix(in oklab,var(--dtc-card) 84%,transparent);backdrop-filter:blur(18px) saturate(1.6);-webkit-backdrop-filter:blur(18px) saturate(1.6)}
+.dtc-brand{display:flex;align-items:center;gap:9px;font-weight:650;font-size:14px;letter-spacing:-.01em;min-width:0}
+.dtc-mark{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:12px;color:var(--dtc-card);flex:none;background:linear-gradient(145deg,color-mix(in oklab,var(--dtc-brand) 82%,#ffffff) 0%,var(--dtc-brand) 48%,color-mix(in oklab,var(--dtc-brand) 52%,#8b5cf6) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 4px 10px -3px color-mix(in oklab,var(--dtc-brand) 55%,transparent)}
+.dtc-brandTitle{font-weight:700;color:var(--dtc-text);letter-spacing:-.01em;white-space:nowrap}
+.dtc-brandBadge{font-size:10px;font-weight:650;letter-spacing:.03em;padding:2px 8px;border-radius:999px;background:color-mix(in oklab,var(--dtc-brand) 9%,transparent);border:1px solid color-mix(in oklab,var(--dtc-brand) 18%,transparent);color:var(--dtc-brand);white-space:nowrap}
+.dtc-selectWrap{position:relative;display:flex;align-items:center;min-width:0}
+.dtc-team{appearance:none;-webkit-appearance:none;border:1px solid var(--dtc-edge);background:var(--dtc-card);color:var(--dtc-text);border-radius:9px;height:28px;padding:0 26px 0 10px;font-size:12px;font-weight:550;font-family:inherit;max-width:300px;text-overflow:ellipsis;cursor:pointer;transition:border-color .16s ease,box-shadow .16s ease,background-color .16s ease}
+.dtc-team:hover{border-color:var(--dtc-edge2);background:var(--dtc-card2)}
+.dtc-team:focus-visible{outline:0;border-color:var(--dtc-brand);box-shadow:0 0 0 3px color-mix(in oklab,var(--dtc-brand) 16%,transparent)}
+.dtc-selectWrap:after{content:"";position:absolute;right:10px;top:50%;width:6px;height:6px;margin-top:-4.5px;border-right:1.5px solid var(--dtc-dim2);border-bottom:1.5px solid var(--dtc-dim2);border-radius:1px;transform:rotate(45deg);pointer-events:none}
+.dtc-live{margin-left:auto;display:flex;align-items:center;gap:8px;height:26px;padding:0 10px;border-radius:999px;border:1px solid var(--dtc-edge);background:color-mix(in oklab,var(--dtc-card2) 72%,transparent);color:var(--dtc-dim);font-size:11px;white-space:nowrap;min-width:0}
+.dtc-live>span:not(.dtc-pulse):not(.dtc-clock){overflow:hidden;text-overflow:ellipsis}
+.dtc-pulse{width:6px;height:6px;border-radius:50%;background:var(--dtc-ok);flex:none;position:relative;box-shadow:0 0 0 0 color-mix(in oklab,var(--dtc-ok) 60%,transparent);animation:dtcRadar 2.4s infinite cubic-bezier(0,0,.2,1)}
+@keyframes dtcRadar{0%{box-shadow:0 0 0 0 color-mix(in oklab,var(--dtc-ok) 60%,transparent)}70%{box-shadow:0 0 0 6px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.dtc-clock{font-variant-numeric:tabular-nums;color:var(--dtc-dim2);font-size:10.5px;padding-left:8px;border-left:1px solid var(--dtc-edge);flex:none}
+
+/* --- 3. 主布局 ----------------------------------------------------------- */
+.dtc-main{flex:1;min-height:0;display:grid;grid-template-columns:296px minmax(0,1fr);background:var(--dtc-bg)}
+
+/* --- 4. 左侧指挥栏 ------------------------------------------------------- */
+.dtc-rail{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:14px 12px 40px;display:flex;flex-direction:column;gap:16px;background:color-mix(in oklab,var(--dtc-card2) 55%,var(--dtc-bg));border-right:1px solid var(--dtc-edge)}
+.dtc-overviewBtn{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border-radius:12px;border:1px solid var(--dtc-edge);background:var(--dtc-card);color:inherit;font:inherit;text-align:left;cursor:pointer;box-shadow:var(--dtc-shadow-sm);transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background-color .16s ease}
+.dtc-overviewBtn:hover{border-color:var(--dtc-edge2);transform:translateY(-1px);box-shadow:var(--dtc-shadow-md)}
+.dtc-overviewBtn.is-on{border-color:color-mix(in oklab,var(--dtc-brand) 40%,transparent);background:linear-gradient(180deg,color-mix(in oklab,var(--dtc-brand) 8%,var(--dtc-card)),var(--dtc-card));box-shadow:var(--dtc-shadow-glow)}
+.dtc-overviewIcon{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-size:13px;background:color-mix(in oklab,var(--dtc-brand) 11%,transparent);border:1px solid color-mix(in oklab,var(--dtc-brand) 16%,transparent);color:var(--dtc-brand);flex:none}
+.dtc-overviewText{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.dtc-overviewText b{font-size:12.5px;font-weight:650;color:var(--dtc-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dtc-overviewText small{font-size:10.5px;color:var(--dtc-dim2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dtc-overviewBadge{font-size:9.5px;font-weight:650;padding:1px 7px;border-radius:999px;background:var(--dtc-card3);color:var(--dtc-dim);border:1px solid transparent;flex:none}
+.dtc-overviewBtn.is-on .dtc-overviewBadge{background:var(--dtc-brand);color:var(--dtc-card)}
+
+/* 栏内分组标题 */
+.dtc-railSection{display:flex;flex-direction:column;gap:6px;min-width:0}
+.dtc-railSection+.dtc-railSection{border-top:1px solid color-mix(in oklab,var(--dtc-edge) 92%,transparent);padding-top:14px}
+.dtc-railHead{display:flex;align-items:center;justify-content:space-between;padding:2px 8px 0;color:var(--dtc-dim2);font-size:10px;font-weight:700;letter-spacing:.06em}
+.dtc-railHead b{min-width:18px;text-align:center;font-size:10px;font-weight:650;letter-spacing:0;color:var(--dtc-dim);background:var(--dtc-card3);padding:0 6px;border-radius:6px;line-height:16px;font-variant-numeric:tabular-nums}
+
+/* 成员行 */
+.dtc-member{position:relative;display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:9px;align-items:center;width:100%;padding:7px 8px;border-radius:10px;border:1px solid transparent;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;transition:background-color .14s ease,box-shadow .14s ease}
+.dtc-member:before{content:"";position:absolute;left:0;top:50%;width:2px;height:18px;border-radius:2px;background:var(--dtc-brand);transform:translateY(-50%) scaleY(0);transition:transform .16s ease}
+.dtc-member:hover{background:var(--dtc-hover)}
+.dtc-member:hover:before{transform:translateY(-50%) scaleY(1);opacity:.45}
+.dtc-member.is-on{background:color-mix(in oklab,var(--dtc-brand) 8%,transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--dtc-brand) 22%,transparent)}
+.dtc-member.is-on:before{transform:translateY(-50%) scaleY(1);opacity:1}
+.dtc-member:focus-visible{outline-offset:-1px}
+.dtc-avatar{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:10.5px;font-weight:700;color:#fff;letter-spacing:0;flex:none;box-shadow:0 0 0 2px color-mix(in oklab,var(--dtc-card) 92%,transparent),0 2px 5px -2px rgba(15,23,42,.35)}
+.dtc-memberBody{min-width:0}
+.dtc-memberName{display:flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;min-width:0;line-height:1.35}
+.dtc-memberName span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dtc-memberActivity{font-size:10.5px;color:var(--dtc-dim2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
+.dtc-memberActivity.is-busy{color:var(--dtc-ok);font-weight:550}
+.dtc-phase{flex:none;font-size:9.5px;font-weight:650;padding:0 5px;border-radius:6px;border:1px solid var(--dtc-edge);color:var(--dtc-dim);line-height:15px;background:var(--dtc-card)}
+.dtc-phase.phase-active{color:var(--dtc-ok);border-color:color-mix(in oklab,var(--dtc-ok) 32%,transparent);background:color-mix(in oklab,var(--dtc-ok) 9%,transparent)}
+.dtc-phase.phase-provisioning{color:var(--dtc-warn);border-color:color-mix(in oklab,var(--dtc-warn) 32%,transparent);background:color-mix(in oklab,var(--dtc-warn) 9%,transparent)}
+.dtc-phase.phase-failed{color:var(--dtc-bad);border-color:color-mix(in oklab,var(--dtc-bad) 32%,transparent);background:color-mix(in oklab,var(--dtc-bad) 9%,transparent)}
+.dtc-dot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--dtc-dim2)}
+.dtc-dot.ok{background:var(--dtc-ok);box-shadow:0 0 0 3px color-mix(in oklab,var(--dtc-ok) 14%,transparent)}
+.dtc-dot.warn{background:var(--dtc-warn);box-shadow:0 0 0 3px color-mix(in oklab,var(--dtc-warn) 14%,transparent)}
+.dtc-dot.bad{background:var(--dtc-bad);box-shadow:0 0 0 3px color-mix(in oklab,var(--dtc-bad) 14%,transparent)}
+.dtc-dot.busy{animation:dtcBlink 1.6s infinite cubic-bezier(.4,0,.2,1)}
+@keyframes dtcBlink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(1.15)}}
+
+/* 请求卡片 */
+.dtc-req{border-radius:12px;background:var(--dtc-card);border:1px solid var(--dtc-edge);overflow:hidden;transition:border-color .16s ease,box-shadow .16s ease}
+.dtc-req:hover{border-color:var(--dtc-edge2);box-shadow:var(--dtc-shadow-sm)}
+.dtc-req.is-open{border-color:color-mix(in oklab,var(--dtc-brand) 28%,var(--dtc-edge));box-shadow:var(--dtc-shadow-sm)}
+.dtc-reqHead{display:flex;flex-direction:column;gap:5px;width:100%;padding:10px 12px;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.dtc-reqHead:focus-visible{outline-offset:-2px}
+.dtc-reqTop{display:flex;align-items:center;gap:6px}
+.dtc-reqIndex{font-size:9.5px;font-weight:650;letter-spacing:.02em;color:var(--dtc-brand);background:color-mix(in oklab,var(--dtc-brand) 9%,transparent);border-radius:6px;padding:1px 6px;line-height:15px}
+.dtc-chevron{margin-left:auto;color:var(--dtc-dim2);font-size:12px;line-height:1;width:16px;height:16px;display:grid;place-items:center;border-radius:5px;transition:transform .2s ease,background-color .16s ease}
+.dtc-reqHead:hover .dtc-chevron{background:var(--dtc-hover);color:var(--dtc-text)}
+.dtc-req.is-open .dtc-chevron{transform:rotate(180deg)}
+.dtc-reqTitle{font-size:12.5px;font-weight:600;line-height:1.45;color:var(--dtc-text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dtc-reqMeta{display:flex;align-items:center;gap:8px;font-size:10.5px;color:var(--dtc-dim2);font-variant-numeric:tabular-nums;flex-wrap:wrap}
+.dtc-avatars{display:flex;align-items:center}
+.dtc-avatarMini{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:9px;font-weight:700;color:#fff;letter-spacing:0;border:2px solid var(--dtc-card);margin-right:-6px;box-shadow:0 1px 2px rgba(15,23,42,.15)}
+.dtc-avatars .dtc-avatarMini:last-child{margin-right:0}
+.dtc-reqBar{height:4px;border-radius:99px;background:color-mix(in oklab,var(--dtc-card3) 55%,var(--dtc-card));overflow:hidden;margin-top:3px}
+.dtc-reqBarFill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--dtc-brand),color-mix(in oklab,var(--dtc-ok) 65%,var(--dtc-brand)));transition:width .4s cubic-bezier(.4,0,.2,1)}
+.dtc-children{display:flex;flex-direction:column;gap:2px;padding:4px 8px 10px 12px;border-top:1px solid var(--dtc-edge);position:relative}
+.dtc-children:before{content:"";position:absolute;left:7px;top:8px;bottom:12px;width:1px;background:color-mix(in oklab,var(--dtc-edge2) 60%,transparent)}
+
+/* 任务行 */
+.dtc-task{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;padding:6px 8px;border-radius:8px;border:1px solid transparent;cursor:pointer;transition:background-color .14s ease,border-color .14s ease}
+.dtc-task:hover{background:var(--dtc-hover)}
+.dtc-task:focus-visible{outline-offset:-1px}
+.dtc-task:has(.dtc-chip.warn){border-left:3px solid color-mix(in oklab,var(--dtc-warn) 78%,var(--dtc-edge));padding-left:6px;background:color-mix(in oklab,var(--dtc-warn) 5%,transparent)}
+.dtc-task:has(.dtc-chip.warn):hover{background:color-mix(in oklab,var(--dtc-warn) 9%,transparent)}
+.dtc-taskMain{min-width:0;display:flex;align-items:center;gap:7px}
+.dtc-id{font-family:var(--dtc-mono);font-size:9.5px;color:var(--dtc-dim2);flex:none;background:var(--dtc-card3);padding:1px 5px;border-radius:4px;line-height:1.4}
+.dtc-taskSubject{font-size:11.5px;color:var(--dtc-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:550}
+.dtc-taskSide{display:flex;align-items:center;gap:6px;flex:none}
+.dtc-ownerPill{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--dtc-edge);background:var(--dtc-card2);border-radius:999px;padding:0 8px 0 3px;height:20px;font-size:10px;color:var(--dtc-dim);max-width:130px;white-space:nowrap}
+.dtc-ownerPill .dtc-avatarMini{width:15px;height:15px;font-size:8px;margin:0;border-width:0;box-shadow:none}
+.dtc-ownerPill span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dtc-ownerPill.unowned{border-style:dashed;background:transparent;color:var(--dtc-dim2);padding:0 7px}
+.dtc-chip{display:inline-flex;align-items:center;height:17px;padding:0 6px;border-radius:6px;background:var(--dtc-card2);border:1px solid var(--dtc-edge);font-size:9.5px;font-weight:650;color:var(--dtc-dim);white-space:nowrap}
+.dtc-chip.ok{color:var(--dtc-ok);border-color:color-mix(in oklab,var(--dtc-ok) 30%,transparent);background:color-mix(in oklab,var(--dtc-ok) 8%,transparent)}
+.dtc-chip.warn{color:var(--dtc-warn);border-color:color-mix(in oklab,var(--dtc-warn) 30%,transparent);background:color-mix(in oklab,var(--dtc-warn) 8%,transparent)}
+.dtc-detailBtn{flex:none;width:18px;height:18px;border-radius:5px;border:0;background:transparent;color:var(--dtc-dim2);font-size:10px;line-height:1;cursor:pointer;opacity:.55;transition:opacity .15s ease,background-color .15s ease,color .15s ease}
+.dtc-task:hover .dtc-detailBtn{opacity:1}
+.dtc-detailBtn:hover{background:var(--dtc-card3);color:var(--dtc-text)}
+.dtc-detailBtn.open{transform:rotate(180deg);color:var(--dtc-brand);opacity:1}
+.dtc-taskDetail{grid-column:1/-1;margin:3px 0 2px;padding:8px 10px;border-radius:8px;background:var(--dtc-card2);border:1px solid var(--dtc-edge);font-size:11px;line-height:1.6;color:var(--dtc-dim);white-space:pre-wrap;word-break:break-word}
+.dtc-taskRow{margin-top:4px;color:var(--dtc-dim2);font-size:10.5px}
+
+/* --- 5. 右侧流式区 ------------------------------------------------------- */
+.dtc-stream{min-height:0;display:flex;flex-direction:column;background:var(--dtc-bg);position:relative}
+.dtc-streamHead{display:flex;align-items:center;gap:9px;padding:0 20px;height:52px;flex:none;border-bottom:1px solid var(--dtc-edge);background:color-mix(in oklab,var(--dtc-card) 62%,var(--dtc-bg))}
+.dtc-backOverviewBtn{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 9px;border-radius:8px;border:1px solid var(--dtc-edge);background:var(--dtc-card);color:var(--dtc-dim);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;flex:none;transition:background-color .14s ease,color .14s ease,border-color .14s ease}
+.dtc-backOverviewBtn:hover{background:var(--dtc-card2);color:var(--dtc-text);border-color:var(--dtc-edge2)}
+.dtc-kind{font-size:9.5px;font-weight:700;letter-spacing:.05em;padding:2px 7px;border-radius:6px;background:color-mix(in oklab,var(--dtc-brand) 10%,transparent);border:1px solid color-mix(in oklab,var(--dtc-brand) 22%,transparent);color:var(--dtc-brand);text-transform:uppercase;flex:none}
+.dtc-stitle{font-size:14px;font-weight:700;letter-spacing:-.01em;color:var(--dtc-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.dtc-smeta{margin-left:auto;font-size:11px;color:var(--dtc-dim2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;font-variant-numeric:tabular-nums}
+
+/* 任务书 */
+.dtc-missionCard{margin:12px 20px 0;padding:10px 14px;border-radius:12px;background:linear-gradient(180deg,color-mix(in oklab,var(--dtc-brand) 6%,var(--dtc-card)),var(--dtc-card));border:1px solid color-mix(in oklab,var(--dtc-brand) 18%,var(--dtc-edge));border-left:3px solid var(--dtc-brand);box-shadow:var(--dtc-shadow-sm);display:flex;flex-direction:column;gap:6px}
+.dtc-missionHead{display:flex;align-items:flex-start;gap:8px}
+.dtc-missionIcon{font-size:12px;line-height:1.5;flex:none}
+.dtc-missionTitle{font-size:12px;font-weight:600;color:var(--dtc-text);line-height:1.5;min-width:0}
+.dtc-missionDesc{font-size:12px;font-weight:600;color:var(--dtc-text);line-height:1.5}
+.dtc-missionToggle{border:0;background:none;padding:0;color:var(--dtc-brand);font-size:10.5px;font-family:inherit;font-weight:650;cursor:pointer;margin-left:auto;flex:none;line-height:1.5}
+.dtc-missionToggle:hover{text-decoration:underline}
+.dtc-missionPrompt{margin:2px 0 0;padding:9px 11px;border-radius:8px;background:var(--dtc-card2);border:1px solid var(--dtc-edge);font-family:var(--dtc-mono);font-size:11px;line-height:1.6;white-space:pre-wrap;word-break:break-word;max-height:220px;overflow-y:auto;color:var(--dtc-dim);margin-left:0}
+
+/* 导读栏 */
+.dtc-sectBar{flex:none;display:flex;align-items:center;gap:8px;padding:0 20px;height:34px;border-bottom:1px solid var(--dtc-edge);background:color-mix(in oklab,var(--dtc-card2) 45%,var(--dtc-bg));font-size:10.5px;color:var(--dtc-dim2);position:sticky;top:0;z-index:5}
+.dtc-sectBar b{font-size:11.5px;font-weight:700;color:var(--dtc-text);letter-spacing:-.005em}
+.dtc-sectNum{background:var(--dtc-card3);border:1px solid var(--dtc-edge);border-radius:6px;padding:0 6px;font-size:9.5px;line-height:16px;font-variant-numeric:tabular-nums;color:var(--dtc-dim);font-weight:650}
+.dtc-guide{flex-wrap:wrap;row-gap:4px}
+.dtc-guideText{margin-left:auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap;color:var(--dtc-dim2);font-size:10.5px}
+.dtc-guideItem{display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+.dtc-guideNo{width:15px;height:15px;border-radius:99px;display:grid;place-items:center;color:var(--dtc-brand);background:color-mix(in oklab,var(--dtc-brand) 10%,transparent);font-weight:700;font-size:9.5px;line-height:1}
+.dtc-stream:has(> .dtc-feed > .dtc-cockpit) .dtc-guideText{display:none}
+.dtc-stream:has(> .dtc-feed > .dtc-cockpit) .dtc-sectBar b{letter-spacing:0}
+
+/* --- 6. 消息流 ----------------------------------------------------------- */
+.dtc-feed{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:20px 24px 80px;display:flex;flex-direction:column;gap:18px}
+.dtc-feed>*{width:100%;max-width:860px;margin:0 auto}
+.dtc-feed>.dtc-cockpit{max-width:none;margin:0;padding:2px 0 8px}
+
+.dtc-talk{display:flex;width:100%;gap:10px;align-items:flex-start}
+.dtc-talk.out{flex-direction:row;justify-content:flex-start}
+.dtc-talk.in{flex-direction:row-reverse;justify-content:flex-start}
+.dtc-talk.dtc-in{animation:dtcRise .28s cubic-bezier(.2,.7,.3,1) both}
+@keyframes dtcRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.dtc-talkAvatar{width:28px;height:28px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;margin-top:2px;box-shadow:0 0 0 2px color-mix(in oklab,var(--dtc-bg) 90%,transparent),0 2px 6px -2px rgba(15,23,42,.3)}
+.dtc-talkBody{flex:0 1 auto;min-width:0;max-width:84%;display:flex;flex-direction:column;gap:5px}
+.dtc-talk.out .dtc-talkBody{align-items:flex-start;margin-right:auto;margin-left:0}
+.dtc-talk.in .dtc-talkBody{align-items:flex-end;margin-left:auto;margin-right:0}
+.dtc-talkLabel{display:flex;align-items:center;gap:6px;font-size:10.5px;font-weight:650;color:var(--dtc-dim2)}
+.dtc-talk.out .dtc-talkLabel{justify-content:flex-start}
+.dtc-talk.in .dtc-talkLabel{justify-content:flex-end;flex-direction:row}
+.dtc-talkLabel b{font-size:11.5px;font-weight:650;color:var(--dtc-text)}
+.dtc-talk.out .dtc-talkLabel b{color:var(--dtc-brand)}
+.dtc-roleTag{font-size:9.5px;font-weight:650;letter-spacing:.02em;color:var(--dtc-brand);border:1px solid color-mix(in oklab,var(--dtc-brand) 26%,transparent);background:color-mix(in oklab,var(--dtc-brand) 8%,transparent);border-radius:5px;padding:0 5px;line-height:16px}
+.dtc-roleTag.reply{color:var(--dtc-ok);border-color:color-mix(in oklab,var(--dtc-ok) 26%,transparent);background:color-mix(in oklab,var(--dtc-ok) 8%,transparent)}
+
+/* 气泡 */
+.dtc-bubble{width:auto;max-width:100%;border-radius:16px;padding:11px 15px;font-size:13px;line-height:1.7;word-break:break-word;box-shadow:var(--dtc-shadow-sm)}
+.dtc-bubble b{font-weight:650;color:var(--dtc-text)}
+.dtc-bubble.out{background:linear-gradient(180deg,color-mix(in oklab,var(--dtc-brand) 7%,var(--dtc-card)),color-mix(in oklab,var(--dtc-brand) 3%,var(--dtc-card)));border:1px solid color-mix(in oklab,var(--dtc-brand) 18%,transparent);border-top-left-radius:5px}
+.dtc-bubble.in{background:var(--dtc-card);border:1px solid var(--dtc-edge);border-top-right-radius:5px;text-align:left;box-shadow:inset 0 1px 0 light-dark(rgba(15,23,42,.06),rgba(255,255,255,.07)),var(--dtc-shadow-sm)}
+.dtc-bubble.clamp{max-height:160px;overflow:hidden;position:relative}
+
+/* 富文本 */
+.dtc-inlineCode{font-family:var(--dtc-mono);font-size:11.5px;background:color-mix(in oklab,var(--dtc-card3) 80%,transparent);padding:1px 5px;border-radius:5px;border:1px solid var(--dtc-edge);color:var(--dtc-text)}
+.dtc-codeBlock{margin:9px 0;padding:11px 13px;border-radius:10px;background:linear-gradient(180deg,#111827,#0b1020);color:#e6edf3;font-family:var(--dtc-mono);font-size:11.5px;line-height:1.6;overflow-x:auto;border:1px solid rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.dtc-codeBlock code{font-family:inherit;background:none;padding:0;border:0;color:inherit}
+.dtc-passMark{color:var(--dtc-ok);font-weight:700;display:inline-block;margin-right:2px}
+
+/* Markdown 渲染（气泡内的 .dtc-md 作用域；颜色一律走 --dtc-* 令牌） */
+.dtc-md{overflow-wrap:anywhere}
+.dtc-md>:first-child{margin-top:0}
+.dtc-md>:last-child{margin-bottom:0}
+.dtc-md p{margin:0 0 7px;line-height:1.7}
+.dtc-md h1,.dtc-md h2{font-size:15px;font-weight:700;line-height:1.4;margin:15px 0 7px;color:var(--dtc-text);letter-spacing:-.01em}
+.dtc-md h3,.dtc-md h4{font-size:13.5px;font-weight:650;line-height:1.45;margin:12px 0 6px;color:var(--dtc-text)}
+.dtc-md h1+p,.dtc-md h2+p,.dtc-md h3+p,.dtc-md h4+p{margin-top:0}
+.dtc-md strong,.dtc-md b{font-weight:650;color:var(--dtc-text)}
+.dtc-md em,.dtc-md i{font-style:italic}
+.dtc-md del{color:var(--dtc-dim2);text-decoration:line-through}
+.dtc-md ul,.dtc-md ol{margin:0 0 7px;padding-left:20px}
+.dtc-md li{margin:2px 0;line-height:1.62}
+.dtc-md li>ul,.dtc-md li>ol{margin:2px 0;padding-left:16px}
+.dtc-md blockquote{margin:0 0 8px;padding:3px 0 3px 10px;border-left:3px solid color-mix(in oklab,var(--dtc-brand) 34%,var(--dtc-edge));color:var(--dtc-dim);font-size:12.5px}
+.dtc-md blockquote>:first-child{margin-top:0}
+.dtc-md blockquote>:last-child{margin-bottom:0}
+.dtc-md .dtc-mdScroll{max-width:100%;overflow-x:auto;margin:0 0 8px;overscroll-behavior-x:contain}
+.dtc-md table{border-collapse:collapse;width:100%;min-width:max-content;font-size:12px;line-height:1.55}
+.dtc-md th,.dtc-md td{border:1px solid color-mix(in oklab,var(--dtc-edge) 85%,transparent);padding:4px 8px;text-align:left;vertical-align:top;overflow-wrap:anywhere}
+.dtc-md th{background:color-mix(in oklab,var(--dtc-card3) 55%,transparent);font-weight:650;color:var(--dtc-text);white-space:nowrap}
+.dtc-md tbody tr:nth-child(even) td{background:color-mix(in oklab,var(--dtc-card2) 45%,transparent)}
+.dtc-md a{color:var(--dtc-brand);text-decoration:none;border-bottom:1px solid color-mix(in oklab,var(--dtc-brand) 32%,transparent)}
+.dtc-md a:hover{text-decoration:underline;border-bottom-color:var(--dtc-brand)}
+.dtc-md hr{border:0;border-top:1px solid var(--dtc-edge);margin:12px 0}
+.dtc-md pre.dtc-codeBlock{margin:9px 0}
+.dtc-md code{overflow-wrap:anywhere}
+.dtc-md br{line-height:1.7}
+
+/* 执行步骤 */
+.dtc-steps{margin-top:6px;border:1px solid var(--dtc-edge);border-radius:12px;background:color-mix(in oklab,var(--dtc-card2) 62%,var(--dtc-card));padding:9px 12px 6px;max-width:100%;width:100%;min-width:min(100%,360px);box-shadow:var(--dtc-shadow-sm)}
+.dtc-talk.out .dtc-steps{border-top-left-radius:5px}
+.dtc-talk.in .dtc-steps{border-top-right-radius:5px}
+.dtc-stepsHead{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--dtc-dim2);margin-bottom:6px;display:flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.dtc-stepList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.dtc-stepItem{position:relative;z-index:0;display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:9px;align-items:start;padding:6px 0;border-bottom:1px solid color-mix(in oklab,var(--dtc-edge) 60%,transparent)}
+.dtc-stepItem:before{content:"";position:absolute;left:9.5px;top:27px;bottom:-7px;width:1px;z-index:-1;pointer-events:none;background:color-mix(in oklab,var(--dtc-edge) 90%,transparent)}
+.dtc-stepItem:last-child{border-bottom:0}
+.dtc-stepItem:last-child:before{display:none}
+.dtc-stepNo{width:20px;height:20px;border-radius:50%;background:var(--dtc-card3);border:1px solid var(--dtc-edge);color:var(--dtc-dim2);font-size:9.5px;font-weight:700;display:grid;place-items:center;font-variant-numeric:tabular-nums;margin-top:1px}
+.dtc-stepItem.ok .dtc-stepNo{background:color-mix(in oklab,var(--dtc-ok) 12%,color-mix(in oklab,var(--dtc-card2) 62%,var(--dtc-card)));border-color:color-mix(in oklab,var(--dtc-ok) 34%,transparent);color:var(--dtc-ok)}
+.dtc-stepItem.bad .dtc-stepNo{background:color-mix(in oklab,var(--dtc-bad) 12%,color-mix(in oklab,var(--dtc-card2) 62%,var(--dtc-card)));border-color:color-mix(in oklab,var(--dtc-bad) 34%,transparent);color:var(--dtc-bad)}
+.dtc-stepMain{min-width:0}
+.dtc-stepTitle{font-size:12px;line-height:1.5;font-weight:550;color:var(--dtc-text);word-break:break-word}
+.dtc-stepMeta{font-size:10px;color:var(--dtc-dim2);margin-top:2px;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
+.dtc-stepItem.ok .dtc-stepMeta{color:color-mix(in oklab,var(--dtc-ok) 80%,var(--dtc-dim2))}
+.dtc-stepItem.bad .dtc-stepMeta{color:var(--dtc-bad)}
+.dtc-stepFold{grid-column:2/-1}
+.dtc-stepMore{list-style:none;cursor:pointer;font-size:10px;line-height:16px;color:var(--dtc-dim2);border:1px solid var(--dtc-edge);border-radius:6px;padding:0 7px;background:var(--dtc-card);white-space:nowrap;transition:color .14s ease,border-color .14s ease}
+.dtc-stepMore::-webkit-details-marker{display:none}
+.dtc-stepMore:hover{color:var(--dtc-brand);border-color:color-mix(in oklab,var(--dtc-brand) 40%,var(--dtc-edge))}
+.dtc-stepFold[open]>.dtc-stepMore{color:var(--dtc-brand)}
+.dtc-stepFold>pre{grid-column:2/-1;margin:6px 0 0;border-radius:8px}
+.dtc-pre{border:1px solid var(--dtc-edge);background:color-mix(in oklab,var(--dtc-card) 55%,var(--dtc-bg));font-family:var(--dtc-mono);font-size:10.5px;line-height:1.6;padding:9px 11px;max-height:280px;overflow:auto;border-radius:8px;white-space:pre-wrap;word-break:break-word;color:var(--dtc-text)}
+
+/* 思考过程 */
+.dtc-thinkFold{margin-top:6px;border-top:1px dashed var(--dtc-edge);padding-top:7px}
+.dtc-thinkFold>summary{font-size:10.5px;font-weight:600;color:var(--dtc-dim2);cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:5px;transition:color .14s ease}
+.dtc-thinkFold>summary:before{content:"\25B8";font-size:9px;line-height:1;transition:transform .18s ease}
+.dtc-thinkFold[open]>summary:before{transform:rotate(90deg)}
+.dtc-thinkFold>summary::-webkit-details-marker{display:none}
+.dtc-thinkFold>summary:hover{color:var(--dtc-brand)}
+.dtc-thinkText{font-size:11px;border-left:2px solid color-mix(in oklab,var(--dtc-brand) 32%,var(--dtc-edge));background:color-mix(in oklab,var(--dtc-card2) 70%,transparent);padding:6px 10px;margin-top:6px;border-radius:0 8px 8px 0;color:var(--dtc-dim);line-height:1.6;white-space:pre-wrap}
+
+/* --- 7. 团队指挥中枢 ----------------------------------------------------- */
+.dtc-cockpit{display:flex;flex-direction:column;gap:20px;min-width:0}
+.dtc-cockpitHero{position:relative;isolation:isolate;overflow:hidden;padding:22px 24px;border-radius:18px;border:1px solid color-mix(in oklab,var(--dtc-brand) 16%,var(--dtc-edge));background:linear-gradient(180deg,color-mix(in oklab,var(--dtc-brand) 5%,var(--dtc-card)),var(--dtc-card));box-shadow:var(--dtc-shadow-md);display:flex;flex-direction:column;gap:10px}
+.dtc-cockpitHero:before{content:"";position:absolute;left:-10%;right:-10%;top:-70%;height:210%;z-index:-1;pointer-events:none;background:radial-gradient(58% 46% at 14% 26%,color-mix(in oklab,var(--dtc-brand) 20%,transparent),transparent 70%),radial-gradient(48% 40% at 92% 18%,color-mix(in oklab,#8b5cf6 14%,transparent),transparent 72%)}
+.dtc-cockpitHero:after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.26;background-image:linear-gradient(90deg,color-mix(in oklab,var(--dtc-text) 5%,transparent) 1px,transparent 1px),linear-gradient(180deg,color-mix(in oklab,var(--dtc-text) 5%,transparent) 1px,transparent 1px);background-size:28px 28px;mask-image:radial-gradient(120% 100% at 50% 0%,#000 15%,transparent 70%);-webkit-mask-image:radial-gradient(120% 100% at 50% 0%,#000 15%,transparent 70%)}
+.dtc-cockpitBadgeRow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dtc-cockpitTag{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--dtc-brand);background:color-mix(in oklab,var(--dtc-brand) 10%,transparent);border:1px solid color-mix(in oklab,var(--dtc-brand) 22%,transparent);padding:3px 10px;border-radius:999px;line-height:1.5}
+.dtc-cockpitStateTag{font-size:10px;font-weight:650;color:var(--dtc-ok);background:color-mix(in oklab,var(--dtc-ok) 9%,transparent);border:1px solid color-mix(in oklab,var(--dtc-ok) 24%,transparent);padding:3px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;line-height:1.5}
+.dtc-cockpitTitle{font-size:22px;font-weight:750;color:var(--dtc-text);letter-spacing:-.02em;line-height:1.32;text-wrap:balance}
+.dtc-cockpitMeta{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--dtc-dim);flex-wrap:wrap}
+.dtc-cockpitMeta span{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:3px 9px;border-radius:999px;background:color-mix(in oklab,var(--dtc-card) 70%,transparent);border:1px solid var(--dtc-edge);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* 指标卡 */
+.dtc-metricsGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.dtc-metricCard{padding:14px 16px;border-radius:14px;background:var(--dtc-card);border:1px solid var(--dtc-edge);box-shadow:var(--dtc-shadow-sm);display:flex;flex-direction:column;gap:4px;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.dtc-metricCard:hover{transform:translateY(-2px);border-color:var(--dtc-edge2);box-shadow:var(--dtc-shadow-md)}
+.dtc-metricHead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dtc-metricLabel{font-size:10px;font-weight:700;color:var(--dtc-dim2);letter-spacing:.06em}
+.dtc-metricIcon{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:12px;background:var(--dtc-card2);border:1px solid var(--dtc-edge);color:var(--dtc-brand);flex:none}
+.dtc-metricVal{font-size:30px;font-weight:750;color:var(--dtc-text);font-variant-numeric:tabular-nums;letter-spacing:-.03em;line-height:1.15;margin-top:2px}
+.dtc-metricSub{font-size:10.5px;color:var(--dtc-dim2)}
+
+/* 区块标题 */
+.dtc-sectionHead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-top:4px}
+.dtc-sectionTitle{font-size:13px;font-weight:700;color:var(--dtc-text);display:flex;align-items:center;gap:7px;letter-spacing:-.005em}
+.dtc-sectionTitle:before{content:"";width:3px;height:13px;border-radius:2px;background:var(--dtc-brand);flex:none}
+.dtc-sectionSub{font-size:10.5px;color:var(--dtc-dim2);text-align:right}
+
+/* 智能体集群卡 */
+.dtc-fleetGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.dtc-fleetCard{padding:14px 16px;border-radius:14px;background:var(--dtc-card);border:1px solid var(--dtc-edge);box-shadow:var(--dtc-shadow-sm);display:flex;flex-direction:column;gap:10px;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.dtc-fleetCard:hover{transform:translateY(-2px);border-color:color-mix(in oklab,var(--dtc-brand) 28%,var(--dtc-edge));box-shadow:var(--dtc-shadow-md)}
+.dtc-fleetCardHead{display:flex;align-items:center;gap:9px}
+.dtc-fleetCardHead .dtc-avatar{width:30px;height:30px;font-size:12px}
+.dtc-fleetNameRow{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.dtc-fleetName{font-size:13px;font-weight:700;color:var(--dtc-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;letter-spacing:-.005em}
+.dtc-fleetRoleTag{align-self:flex-start;font-size:9.5px;font-weight:650;padding:1px 6px;border-radius:5px;background:var(--dtc-card2);border:1px solid var(--dtc-edge);color:var(--dtc-dim)}
+.dtc-fleetRoleTag.lead{background:color-mix(in oklab,var(--dtc-brand) 10%,transparent);border-color:color-mix(in oklab,var(--dtc-brand) 20%,transparent);color:var(--dtc-brand)}
+.dtc-fleetActivity{font-size:11px;color:var(--dtc-dim);display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:6px 9px;border-radius:9px;background:var(--dtc-card2);border:1px solid transparent;min-width:0}
+.dtc-fleetActivity.busy{color:var(--dtc-ok);background:color-mix(in oklab,var(--dtc-ok) 8%,var(--dtc-card2));font-weight:550}
+.dtc-fleetStats{display:flex;align-items:center;gap:12px;font-size:10.5px;color:var(--dtc-dim2);font-variant-numeric:tabular-nums}
+.dtc-fleetStats b{color:var(--dtc-text);font-weight:700;font-size:11px}
+.dtc-fleetMission{font-size:11px;color:var(--dtc-dim2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;padding-left:8px;border-left:2px solid color-mix(in oklab,var(--dtc-brand) 26%,transparent)}
+.dtc-fleetBtn{margin-top:auto;display:inline-flex;align-items:center;justify-content:center;gap:5px;width:100%;height:30px;padding:0 10px;border-radius:9px;border:1px solid color-mix(in oklab,var(--dtc-brand) 22%,transparent);background:color-mix(in oklab,var(--dtc-brand) 7%,transparent);color:var(--dtc-brand);font-size:11px;font-weight:650;cursor:pointer;font-family:inherit;transition:background-color .15s ease,color .15s ease,border-color .15s ease,box-shadow .15s ease,transform .15s ease}
+.dtc-fleetBtn:hover{background:var(--dtc-brand);color:var(--dtc-card);border-color:transparent;box-shadow:var(--dtc-shadow-glow)}
+.dtc-fleetBtn:active{transform:translateY(1px)}
+
+/* 任务矩阵 */
+.dtc-cockpitTasks{padding:14px 16px;border-radius:14px;background:var(--dtc-card);border:1px solid var(--dtc-edge);display:flex;flex-direction:column;gap:10px}
+.dtc-tasksGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.dtc-taskCardItem{padding:11px 12px;border-radius:10px;background:var(--dtc-card2);border:1px solid var(--dtc-edge);cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:transform .14s ease,background-color .14s ease,border-color .14s ease,box-shadow .14s ease}
+.dtc-taskCardItem:hover{border-color:color-mix(in oklab,var(--dtc-brand) 32%,var(--dtc-edge));background:var(--dtc-card);transform:translateY(-1px);box-shadow:var(--dtc-shadow-sm)}
+.dtc-taskCardItem.is-unassigned{cursor:default}
+.dtc-taskCardItem.is-unassigned:hover{transform:none;border-color:var(--dtc-edge);background:var(--dtc-card2);box-shadow:none}
+.dtc-taskCardHead{display:flex;align-items:center;gap:7px;min-width:0}
+.dtc-taskCardTitle{font-size:11.5px;font-weight:600;color:var(--dtc-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.dtc-taskCardDesc{font-size:10.5px;color:var(--dtc-dim2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.dtc-taskCardFoot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px}
+
+/* 自动流程 */
+.dtc-autoFlow{padding:14px 16px;border-radius:14px;background:color-mix(in oklab,var(--dtc-brand) 4%,var(--dtc-card));border:1px dashed color-mix(in oklab,var(--dtc-brand) 28%,var(--dtc-edge));display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dtc-flowStep{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--dtc-text)}
+.dtc-flowArrow{color:var(--dtc-brand);font-size:13px;line-height:1}
+
+/* --- 8. 杂项：事件、空态、跳转、骨架 ------------------------------------ */
+.dtc-event{align-self:center;display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--dtc-dim2);padding:3px 12px;border-radius:999px;border:1px dashed var(--dtc-edge);background:var(--dtc-card2);max-width:100%}
+.dtc-truncHint{align-self:center;width:auto!important;font-size:11px;color:var(--dtc-dim2);padding:4px 12px;border-radius:999px;border:1px dashed var(--dtc-edge);background:var(--dtc-card2);text-align:center}
+.dtc-memberRoleTag{flex:none;font-size:9.5px;font-weight:650;padding:0 5px;border-radius:6px;background:color-mix(in oklab,var(--dtc-brand) 10%,transparent);border:1px solid color-mix(in oklab,var(--dtc-brand) 22%,transparent);color:var(--dtc-brand);line-height:15px}
+.dtc-subSteps{margin-top:6px;padding:6px 8px;border-radius:6px;background:color-mix(in oklab,var(--dtc-card2) 80%,transparent);border:1px solid var(--dtc-edge);font-size:10.5px;display:flex;flex-direction:column;gap:3px}
+.dtc-subStep{display:flex;align-items:center;gap:6px;color:var(--dtc-dim);word-break:break-word}
+.dtc-subStep.bad{color:var(--dtc-bad)}
+.dtc-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:48px 20px;text-align:center;color:var(--dtc-dim)}
+.dtc-emptyIcon{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:20px;background:linear-gradient(180deg,color-mix(in oklab,var(--dtc-brand) 10%,var(--dtc-card)),var(--dtc-card));border:1px solid var(--dtc-edge);color:var(--dtc-brand);box-shadow:var(--dtc-shadow-sm)}
+.dtc-empty h4{margin:0;font-size:14px;font-weight:700;color:var(--dtc-text)}
+.dtc-empty p{margin:0;font-size:11.5px;max-width:420px;line-height:1.7;color:var(--dtc-dim2)}
+.dtc-jump{position:absolute;right:24px;bottom:22px;z-index:20;display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 13px;border-radius:999px;border:1px solid var(--dtc-edge);background:color-mix(in oklab,var(--dtc-card) 92%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:var(--dtc-text);font-size:11px;font-weight:600;font-family:inherit;cursor:pointer;box-shadow:var(--dtc-shadow-md);transition:transform .15s ease,border-color .15s ease,color .15s ease}
+.dtc-jump:hover{transform:translateY(-1px);border-color:color-mix(in oklab,var(--dtc-brand) 40%,var(--dtc-edge));color:var(--dtc-brand)}
+
+/* 骨架屏 */
+.dtc-skelRow{display:flex;align-items:center;gap:9px;padding:8px}
+.dtc-skelDot{width:26px;height:26px;border-radius:50%;flex:none;background:linear-gradient(90deg,var(--dtc-card3) 0%,var(--dtc-card2) 50%,var(--dtc-card3) 100%);background-size:200% 100%;animation:dtcShimmer 1.6s linear infinite}
+.dtc-skelCol{flex:1;display:flex;flex-direction:column;gap:6px;min-width:0}
+.dtc-skelLine{height:8px;border-radius:99px;background:linear-gradient(90deg,var(--dtc-card3) 0%,var(--dtc-card2) 50%,var(--dtc-card3) 100%);background-size:200% 100%;animation:dtcShimmer 1.6s linear infinite}
+.dtc-skelLine.short{width:45%}
+.dtc-skelBlock{height:64px;border-radius:12px;background:linear-gradient(90deg,var(--dtc-card) 0%,var(--dtc-card2) 50%,var(--dtc-card) 100%);border:1px solid var(--dtc-edge);background-size:200% 100%;animation:dtcShimmer 1.6s linear infinite}
+@keyframes dtcShimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* --- 9. 滚动条 / 响应式 / 动效降级 -------------------------------------- */
+.dtc-root ::-webkit-scrollbar{width:8px;height:8px}
+.dtc-root ::-webkit-scrollbar-track{background:transparent}
+.dtc-root ::-webkit-scrollbar-thumb{background:var(--dtc-edge2);border:2px solid transparent;background-clip:content-box;border-radius:99px}
+.dtc-root ::-webkit-scrollbar-thumb:hover{background:var(--dtc-dim2);border:2px solid transparent;background-clip:content-box}
+
+@container dtc (max-width:900px){
+  .dtc-main{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr)}
+  .dtc-stream{min-width:0}
+  .dtc-rail{flex-direction:row;align-items:flex-start;gap:12px;overflow:auto;max-height:34vh;border-bottom:1px solid var(--dtc-edge);border-right:0;padding:12px}
+  .dtc-overviewBtn{width:auto;min-width:196px;flex:none}
+  .dtc-railSection{flex:none;width:260px}
+  .dtc-railSection+.dtc-railSection{border-top:0;padding-top:0;border-left:1px solid color-mix(in oklab,var(--dtc-edge) 92%,transparent);padding-left:12px}
+  .dtc-req{min-width:0;flex:1}
+  .dtc-feed{padding:16px 16px 56px}
+  .dtc-top{padding:0 12px;gap:8px}
+  .dtc-team{max-width:180px}
+  .dtc-smeta{display:none}
+  .dtc-talkBody{max-width:90%}
+  .dtc-metricsGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dtc-cockpitHero{padding:18px}
+  .dtc-cockpitTitle{font-size:19px}
+}
+@container dtc (max-width:600px){
+  .dtc-brandBadge{display:none}
+  .dtc-clock{display:none}
+  .dtc-railHead{display:none}
+  .dtc-guideText{display:none}
+  .dtc-talkBody{max-width:100%}
+  .dtc-metricsGrid{grid-template-columns:1fr}
+  .dtc-cockpitTitle{font-size:18px}
+  .dtc-overviewBtn{width:auto;min-width:176px}
+  .dtc-brandTitle{font-size:13px}
+  .dtc-team{max-width:140px}
+  .dtc-brand{min-width:0}
+  .dtc-brandTitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dtc-railSection{width:240px}
+  .dtc-missionCard{margin:10px 12px 0}
+  .dtc-sectBar{padding:0 12px}
+}
+@media (prefers-reduced-motion:reduce){
+  .dtc-root *,.dtc-root *:before,.dtc-root *:after{animation:none!important;transition:none!important}
+}

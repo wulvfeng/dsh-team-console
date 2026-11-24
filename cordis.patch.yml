@@ -1,0 +1,11 @@
+# dsh-team-console bundle 层：插入团队控制台插件行。
+# 插件在 Host 侧启动一个只监听 127.0.0.1 的本地仪表盘。
+- insert:
+    - id: team-console
+      name: 'dsh-team-console'
+      config:
+        port: 4318
+        # 可选：覆盖会话存储根目录（默认 %USERPROFILE%\.dsh\sessions）
+        # sessionsRoot: 'C:/Users/me/.dsh/sessions'
+        # 可选：历史扫描窗口（天），默认 14
+        maxAgeDays: 14

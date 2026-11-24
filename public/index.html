@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Agent Teams 团队协同控制台 · dsh-team-console</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <div class="dtc-root" id="root">
+    <header class="dtc-top">
+      <div class="dtc-brand">
+        <span class="dtc-mark">◈</span>
+        <span class="dtc-brandTitle">Agent Teams</span>
+        <span class="dtc-brandBadge">协同控制台</span>
+      </div>
+      <span class="dtc-selectWrap"><select class="dtc-team" id="teamSelect" title="切换协同团队"></select></span>
+      <div class="dtc-live"><span class="dtc-pulse" id="liveDot"></span><span id="liveText">实时连接</span><span class="dtc-clock" id="clock"></span></div>
+    </header>
+    <main class="dtc-main">
+      <aside class="dtc-rail">
+        <button type="button" class="dtc-overviewBtn" id="overviewNavBtn">
+          <span class="dtc-overviewIcon">◈</span>
+          <span class="dtc-overviewText">
+            <b>团队指挥中枢</b>
+            <small id="overviewSub">智能体集群全貌与监控</small>
+          </span>
+          <span class="dtc-overviewBadge" id="overviewBadge">总览</span>
+        </button>
+        <div id="tree">
+          <section class="dtc-req"><div class="dtc-reqHead"><div class="dtc-skelLine" style="width:70%"></div><div class="dtc-skelLine short"></div></div></section>
+        </div>
+      </aside>
+      <section class="dtc-stream">
+        <header class="dtc-streamHead">
+          <span class="dtc-kind" id="streamKind">—</span>
+          <span class="dtc-stitle" id="streamTitle">会话</span>
+          <span class="dtc-smeta" id="streamMeta"></span>
+        </header>
+        <div id="context"></div>
+        <div id="sectBar"></div>
+        <div class="dtc-feed" id="feed"><div class="dtc-skelBlock"></div><div class="dtc-skelBlock"></div><div class="dtc-skelBlock"></div></div>
+        <button class="dtc-jump" id="jumpBtn" type="button" hidden>回到最新 ↓</button>
+      </section>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

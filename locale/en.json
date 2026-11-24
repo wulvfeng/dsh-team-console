@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Team Console",
+    "description": "Read-only dashboard for DSH agent teams: member status, shared task board and full session streams."
+  }
+}
