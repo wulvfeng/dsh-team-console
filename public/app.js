@@ -1083,15 +1083,20 @@
   }
 
   function renderTeams() {
-    /* B2：签名必须覆盖真正渲染的四个字段，否则团队标题 / 人数变化时下拉永久冻结。 */
-    var signature = state.teams.map(function (item) { return [item.leadId, item.title, item.memberCount, item.openTaskCount].join("\u0001"); }).join("\u0002");
+    /* 签名必须覆盖真正渲染的字段（标题 / 成员数 / 总任务数 / 未完成数），否则数量变化时下拉不刷新。 */
+    var signature = state.teams.map(function (item) { return [item.leadId, item.title, item.memberCount, item.taskCount, item.openTaskCount].join("\u0001"); }).join("\u0002");
     if (nodes.teamSelect.getAttribute("data-signature") === signature) {
       nodes.teamSelect.value = state.leadId || "";
       return;
     }
     nodes.teamSelect.setAttribute("data-signature", signature);
     nodes.teamSelect.innerHTML = state.teams.map(function (item) {
-      return '<option value="' + esc(item.leadId) + '">' + esc((item.title || item.leadId) + " · " + item.memberCount + " 人 · " + item.openTaskCount + " 任务") + "</option>";
+      /* 与面板端一致：智能体含 Lead 主控；任务按总数（不是仅未完成），未完成数放进 title 提示。 */
+      var agents = (typeof item.memberCount === "number" ? item.memberCount : 0) + 1;
+      var totalTasks = typeof item.taskCount === "number" ? item.taskCount : (item.openTaskCount || 0);
+      var openTasks = typeof item.openTaskCount === "number" ? item.openTaskCount : 0;
+      var hint = "共 " + totalTasks + " 项任务（" + openTasks + " 项未完成）";
+      return '<option value="' + esc(item.leadId) + '" title="' + esc(hint) + '">' + esc((item.title || item.leadId) + " · " + agents + " 智能体 · " + totalTasks + " 任务") + "</option>";
     }).join("");
     nodes.teamSelect.value = state.leadId || "";
   }

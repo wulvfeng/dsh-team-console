@@ -134,7 +134,7 @@ node install.mjs
 
 | 路径 | 说明 |
 | --- | --- |
-| `GET /api/teams` | 所有含团队的 lead 会话（标题、成员数、未完成任务数） |
+| `GET /api/teams` | 所有含团队的 lead 会话（标题、成员数（无 `team/member` 事件时按子会话兜底）、任务总数、未完成数） |
 | `GET /api/team?lead=<id>` | 团队名册 + 任务板 + lead 摘要（含 activity） |
 | `GET /api/session/<id>?limit=200` | 规范化会话流（user / assistant / reasoning / tool / team / context） |
 | `GET /api/health` | 存活检查与配置回显 |
@@ -246,13 +246,23 @@ DSH 没有内置官方索引；社区目录生成的索引会被多个市场引�
 ```
 node tools/build-css.mjs            # 把 tmp-css.txt 注入 lib/client.js 并重生成 public/style.css
 node tools/build-css.mjs --check    # 校验双端 CSS 是否同步（退出码 0）
-node tools/verify.mjs               # 72 项验收：语法 / CSS 同步 / 步骤说人话 / XSS / 左右方向 / 双端一致 / 边界参数
+node tools/verify.mjs               # 73 项验收：语法 / CSS 同步 / 步骤说人话 / XSS / 左右方向 / 双端一致 / 边界参数
 npm test                            # smoke + regression 回归（内部也会跑 verify 与 build-css --check）
 ```
 
 `verify.mjs` 会用 React 桩渲染面板端、用 DOM 桩渲染独立端，并用 `<img onerror>` 探针检查转义。
 
 ## 变更记录
+
+### 0.9.7 — 顶部团队数量修正
+
+顶部团队下拉里的「N 人 · M 任务」在部分场景下数字对不上（例如显示「0 人 · 3 任务」，但面板里明明列着 6 个成员、任务板有 6 项任务）：
+
+- **成员数**：未开启「智能体团队协作」时日志里没有 `team/member` 事件，旧逻辑直接报 0；现在用子会话的 `parentSession` 兜底计数（与成员名册一致），有 `team/member` 事件时仍以事件为准，不会重复计数。
+- **任务数**：之前取的是「未完成数」却标成「任务」，现在显示任务总数，未完成数放进下拉项的 `title` 提示（「共 M 项任务（K 项未完成）」）。
+- **智能体数**：与左侧栏 / 总览口径统一，包含 Lead 主控（成员数 + 1），文案由「人」改为「智能体」。
+
+验收：`node tools/verify.mjs` 73 项 + `node test/regression.mjs` 15 项全绿。
 
 ### 0.9.6 — 会话流发送者归属修正
 

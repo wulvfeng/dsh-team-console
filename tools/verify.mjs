@@ -192,6 +192,7 @@ const feedHtml = String((elements.get("feed") || {}).innerHTML || "");
 
 check("独立端：有内容", feedHtml.length > 200, "长度 " + feedHtml.length);
 check("独立端：任务书发送者标为 Lead 主控", feedHtml.indexOf("Lead 主控") !== -1);
+check("独立端：团队选择器按 Lead + 总任务数显示", String((elements.get("teamSelect") || {}).innerHTML || "").indexOf("2 智能体 · 0 任务") !== -1);
 check("独立端：XSS 已转义（含 &lt;img）", feedHtml.indexOf("&lt;img") !== -1);
 check("独立端：无裸 <img", feedHtml.indexOf("<img") === -1);
 check("独立端：无 <script", feedHtml.indexOf("<script") === -1);

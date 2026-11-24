@@ -564,6 +564,51 @@ try {
     assert.equal(leadUsers[0].sender.name, "用户");
   });
 
+  // 15. 团队列表成员数：没有 team/member 事件时用子会话兜底；有 team 事件时不重复计数
+  await test("team index: 团队列表成员数与 session-tree 兜底一致且不重复计数", async () => {
+    const now = Date.now();
+    const mk = (root, wsName, dirName, lines) => {
+      const dir = path.join(root, wsName, dirName);
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, "session.v4.jsonl"), lines.map((l) => JSON.stringify(l)).join("\n") + "\n");
+    };
+
+    // A. 只有 team/task 事件（未开启团队协作）+ 2 个子会话：memberCount 必须按子会话兜底为 2
+    const rootA = path.join(tmpRoot, "count-tree");
+    mk(rootA, "ws", "session-count-lead", [
+      { type: "session", version: 4, id: "session-count-lead", createdAt: now - 6000, cwd: "C:/p" },
+      { type: "team/task", seq: 1, time: now - 5000, data: { version: 2, teamId: "session-count-lead", task: { id: "task-1", subject: "T", status: "in_progress", blockedBy: [] } } }
+    ]);
+    mk(rootA, "ws", "count-child-a", [
+      { type: "session", version: 4, id: "count-child-a", parentSession: "session-count-lead", origin: "subagent", createdAt: now - 4500, cwd: "C:/p" },
+      { type: "turn/start", seq: 1, time: now - 4000, data: { turn: 1 } }
+    ]);
+    mk(rootA, "ws", "count-child-b", [
+      { type: "session", version: 4, id: "count-child-b", parentSession: "session-count-lead", origin: "subagent", createdAt: now - 4300, cwd: "C:/p" }
+    ]);
+    const teamsA = await buildTeamIndexAsync({ sessionsRoot: rootA });
+    assert.equal(teamsA.length, 1);
+    assert.equal(teamsA[0].memberCount, 2, "无 team/member 事件时应按子会话数兜底");
+    assert.equal(teamsA[0].taskCount, 1);
+    assert.equal(teamsA[0].openTaskCount, 1);
+
+    // B. team/member 事件 + 同成员的子会话：不能把同一批成员算两遍
+    const rootB = path.join(tmpRoot, "count-team");
+    mk(rootB, "ws", "session-count-team-lead", [
+      { type: "session", version: 4, id: "session-count-team-lead", createdAt: now - 6000, cwd: "C:/p" },
+      { type: "team/member", seq: 1, time: now - 5000, data: { version: 2, teamId: "session-count-team-lead", member: { id: "m-1", name: "worker", phase: "active" } } }
+    ]);
+    mk(rootB, "ws", "count-child-m1", [
+      { type: "session", version: 4, id: "count-child-m1", parentSession: "session-count-team-lead", origin: "subagent", createdAt: now - 4500, cwd: "C:/p" }
+    ]);
+    const teamsAsyncB = await buildTeamIndexAsync({ sessionsRoot: rootB });
+    const teamsSyncB = buildTeamIndex({ sessionsRoot: rootB });
+    for (const teams of [teamsAsyncB, teamsSyncB]) {
+      assert.equal(teams.length, 1);
+      assert.equal(teams[0].memberCount, 1, "team/member 事件优先，不应再叠加子会话");
+    }
+  });
+
   console.log("\n回归测试全部通过（" + passed + " 项）");
 } finally {
   fs.rmSync(tmpRoot, { recursive: true, force: true });
