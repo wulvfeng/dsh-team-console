@@ -1,6 +1,6 @@
 {
   "name": "dsh-team-console",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "DSH Agent Teams 只读监控面板：左侧栏「团队」入口，自动展示成员状态、共享任务板，以及每个成员的会话流（消息 / 工具调用 / 结果）。Host 插件 + Web 客户端插件，随包发布。",
   "license": "MIT",
   "icon": "./icon.svg",
@@ -27,12 +27,15 @@
     "lib",
     "public",
     "locale",
+    "tools",
+    "test",
     "cordis.patch.yml",
     "README.md",
     "LICENSE",
     "start.bat",
     "install.mjs",
-    "icon.svg"
+    "icon.svg",
+    "tmp-css.txt"
   ],
   "keywords": [
     "dsh",
@@ -66,7 +69,7 @@
     "@deepseek-ai/dsh-client-ui-primitives": "0.0.1-rc.1"
   },
   "scripts": {
-    "check:syntax": "node --check lib/index.js && node --check lib/server.js && node --check lib/sessions.js && node --check lib/team.js && node --check lib/client.js && node --check public/app.js",
+    "check:syntax": "node --check lib/index.js && node --check lib/server.js && node --check lib/sessions.js && node --check lib/team.js && node --check lib/archive.js && node --check lib/client.js && node --check lib/start.mjs && node --check public/app.js && node --check install.mjs && node --check tools/build-css.mjs && node --check tools/demo.mjs && node --check tools/verify.mjs && node --check test/smoke.mjs && node --check test/regression.mjs",
     "start": "node lib/start.mjs",
     "demo": "node tools/demo.mjs",
     "test": "node test/smoke.mjs && node test/regression.mjs",

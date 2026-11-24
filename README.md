@@ -10,17 +10,13 @@
 
 ## 安装（所有人可用）
 
-```bash
-dsh plugin --profile web add dsh-team-console
-```
-
-桌面版把 `--profile web` 换成实际 profile（例如 `desktop`）。装完重启 DSH，左侧栏「团队」入口即出现；**不需要**运行 `install.mjs` 或手工改 `cordis.patch.yml`。
-
-也可以从 GitHub 源码安装（仓库已提交构建产物，无需放行构建脚本）：
+> **npm 包尚未发布**（registry 上还是 404），当前请直接用 GitHub 源码安装；发布之后 `dsh plugin --profile web add dsh-team-console` 会同样生效。
 
 ```bash
 dsh plugin --profile web add github:wulvfeng/dsh-team-console
 ```
+
+桌面版把 `--profile web` 换成实际 profile（例如 `desktop`）。仓库已提交构建产物，无需放行构建脚本。装完重启 DSH，左侧栏「团队」入口即出现；用这种方式**不需要**运行 `install.mjs` 或手工改 `cordis.patch.yml`。本地开发/离线时也可以用下一节的 `node install.mjs` 直接装源码目录。
 
 验证：`dsh plugin --profile web list` 应列出 `dsh-team-console`。
 
@@ -41,7 +37,7 @@ Lead 会话与每个成员会话看的是同一套渲染，所以"我让他做�
 start.bat
 ```
 
-浏览器会打开 `http://127.0.0.1:4318/`（端口被占会自动顺延，控制台里看实际地址）。
+浏览器会打开 `http://127.0.0.1:4318/`（实际地址以控制台输出为准）。端口占用分两种：Host 插件跑在 DSH 进程内，4318 被占会**自动 +1 顺延**；独立运行 `node lib/start.mjs` 时，如果端口被**其它程序**占用，会提示换端口并以退出码 2 结束（0.7.3 起的防误杀策略），不会自己去抢端口。
 也可以手动：`node lib/start.mjs 4318 --open`。
 
 ## 看效果：示例团队（demo）
@@ -69,15 +65,33 @@ npm run demo
 node install.mjs
 ```
 
-默认装进 `%USERPROFILE%\.dsh\profiles\desktop`，做三件事（都留有 `.team-console-backup-*` 备份）：
+默认装进 `%USERPROFILE%\.dsh\profiles\desktop`，做四件事（改文件前都留有 `.team-console-backup-*` 备份）：
 
 1. 在 `profile/node_modules` 建目录联接 `dsh-team-console`（不需要 pnpm）
 2. 在 profile `package.json` 的 `dependencies` 登记 `link:<本目录>`
-3. 在 profile `cordis.patch.yml` 追加 `team-console` 插件行
+3. 在 profile `package.json` 的 `dsh.profile.bundles` 注册 `dsh-team-console`（DSH 只加载 bundles 里列出的组合包；缺这一步，`cordis.patch.yml` 的插件行不会生效）
+4. 在 profile `cordis.patch.yml` 追加 `team-console` 插件行（按行匹配，可重复执行）
 
-**装完重启 DSH**，Host 启动时就会拉起面板；`http://127.0.0.1:4318/` 常驻。
+脚本整体幂等，中途失败会回滚本次新建的联接与改写的文件。**装完重启 DSH**，Host 启动时就会拉起面板；`http://127.0.0.1:4318/` 常驻。
 
 指定其它 profile：`node install.mjs --profile C:\path\to\profile`。
+
+## 在 DSH 界面里使用（v0.3，左侧栏）
+
+> 面板固定在左侧栏导航行，点一下就在主区域打开：**团队**。
+> 创建团队、派活、催进度 **不经过面板** —— 仍然是在任意会话里用自然语言说；面板只负责自动显示。
+
+1. 重启 DSH（Host 插件在启动时加载，`cordis.patch.yml` 已经装好）。
+2. 刷新 Web 页面，左侧栏出现「团队」图标/行。
+3. 没有团队时显示空状态提示；一旦会话里出现 `spawn_teammate`，成员、任务、会话流自动出现。
+
+面板内容与独立网页一致（同一套只读 API）：
+
+- 成员：阶段、模型、**此刻在做什么**（正在调用哪个工具 / 正在思考 / 空闲 + 多久前）、工具与消息计数
+- 任务板：状态、负责人、依赖链、写入范围；点任务跳到负责人会话
+- 会话流：消息 / 回复 / 每次工具调用（名字、参数、结果）/ 思考过程 / 团队事件
+
+数据通道：Host 半侧在进程内启动只读 API（默认 `127.0.0.1:4318`，占用则顺延），面板从 `4318..4337` 依次探测；只读 GET 只对回环 Origin 回显 `Access-Control-Allow-Origin`（任意网站无法读取），服务只监听回环。
 
 ## 配置
 
@@ -129,7 +143,10 @@ node install.mjs
 
 - **只读**：不能在这里 spawn / 中断 / 改名成员，也不能改任务；这些仍然通过对话做。
 - **任务单负责人**：DSH 的共享任务板一个任务只有一个 `ownerName`；多人协作的任务请拆成多个任务并用 `blocked_by` 串起来，面板会显示依赖与各自的进行状态。
-- **独立页面**：v1 是本地网页，不在 DSH 窗口内嵌（要内嵌成 GUI 面板需要客户端插件 + Host↔Client remote 传输，v2 再做）。
+- **独立页面**：`start.bat` / `node lib/start.mjs` 打开的是不含 DSH 外壳的独立网页；DSH 内请用左侧栏「团队」面板（0.3 起提供），两者读同一套只读 API。
+- **成员活跃度**：成员超过 10 分钟没有任何新事件时，活动标签会显示「（10 分钟无新事件）」并视为非活跃（stale），用于区分「空闲」与「可能已崩溃/被中断」。
+- **语言**：`locale/*.json` 仅用于插件市场/管理器的标题与描述元信息，面板 UI 目前只有中文。
+- **打开方式**：请在浏览器里用 `http://127.0.0.1:<端口>` 或 `http://localhost:<端口>` 打开 DSH 面板；用局域网 IP/其它域名打开时，面板无法跨源读取本地只读 API（这是 CORS 收紧后的安全取舍，避免任意网页读取你的会话记录）。
 - **历史窗口**：默认只列出 14 天内有更新的会话；旧团队不会出现在下拉里。
 
 ## 目录结构
@@ -138,7 +155,7 @@ node install.mjs
 dsh-team-console/
   package.json        cordis 插件清单（dsh.bundle.patch）
   cordis.patch.yml    插件行
-  install.mjs         装入 profile（junction + 依赖 + patch 行）
+  install.mjs         装入 profile（junction + dependencies + dsh.profile.bundles + patch 行）
   start.bat           独立启动（不依赖 DSH）
   lib/
     index.js          cordis Host 插件入口（启动服务、随 fiber 释放关闭）
@@ -157,6 +174,7 @@ dsh-team-console/
 1. 删掉 profile `cordis.patch.yml` 里的 `team-console` 行（或恢复 `.team-console-backup-*`）
 2. 删掉 profile `node_modules\dsh-team-console` 联接
 3. 从 profile `package.json` 的 `dependencies` 移除 `dsh-team-console`
+4. 从 profile `package.json` 的 `dsh.profile.bundles` 移除 `dsh-team-console`（否则 DSH 仍会尝试加载它）
 
 ## 版本
 
@@ -181,22 +199,6 @@ dsh-team-console/
 ### 0.1.0
 
 只读监控面板：团队列表 / 成员活动 / 任务板 / 逐成员会话流（消息 + 工具调用 + 结果）。
-## 在 DSH 界面里使用（v0.3，左侧栏）
-
-> 面板固定在左侧栏导航行，点一下就在主区域打开：**团队**。
-> 创建团队、派活、催进度 **不经过面板** —— 仍然是在任意会话里用自然语言说；面板只负责自动显示。
-
-1. 重启 DSH（Host 插件在启动时加载，`cordis.patch.yml` 已经装好）。
-2. 刷新 Web 页面，左侧栏出现「团队」图标/行。
-3. 没有团队时显示空状态提示；一旦会话里出现 `spawn_teammate`，成员、任务、会话流自动出现。
-
-面板内容与独立网页一致（同一套只读 API）：
-
-- 成员：阶段、模型、**此刻在做什么**（正在调用哪个工具 / 正在思考 / 空闲 + 多久前）、工具与消息计数
-- 任务板：状态、负责人、依赖链、写入范围；点任务跳到负责人会话
-- 会话流：消息 / 回复 / 每次工具调用（名字、参数、结果）/ 思考过程 / 团队事件
-
-数据通道：Host 半侧在进程内启动只读 API（默认 `127.0.0.1:4318`，占用则顺延），面板从 `4318..4324` 依次探测；只读 GET 带 `Access-Control-Allow-Origin: *`，服务只监听回环。
 
 ## 打包 / 发布到插件市场
 
@@ -207,14 +209,14 @@ dsh-team-console/
   "bundle": { "patch": "./cordis.patch.yml" },
   "client": { "platform": "web", "inject": ["@deepseek-ai/dsh-client-ui-primitives"] }
 }
-"exports": { ".": "./lib/index.js", "./client": "./lib/client.js", "./locale/*.json": "./locale/*.json", "./icon": "./icon.svg", "./cordis.patch.yml": "./cordis.patch.yml" }
+"exports": { ".": "./lib/index.js", "./client": "./lib/client.js", "./server": "./lib/server.js", "./cordis.patch.yml": "./cordis.patch.yml", "./locale/*.json": "./locale/*.json", "./icon": "./icon.svg", "./package.json": "./package.json" }
 ```
 
 发布步骤：
 
 1. 推送 GitHub 仓库后，在仓库页面添加 topic `dsh-plugin`。
 2. `npm login` 后执行 `npm publish --access public`（包名 `dsh-team-console`；后续改代码先用 `npm version patch` 递增版本，npm 不允许覆盖已发布版本）。
-3. 满足社区目录的仓库年龄要求（当前约 1 天）后，fork `awesome-dsh-plugin/awesome-dsh-plugin`，新增 `data/plugins/wulvfeng__dsh-team-console.yml`（模板已放在本仓库 `community/data/plugins/`），提交一个只含该文件的 PR。
+3. 满足社区目录的仓库年龄要求后，fork `awesome-dsh-plugin/awesome-dsh-plugin`，新增 `data/plugins/wulvfeng__dsh-team-console.yml`（模板已放在本仓库 `community/data/plugins/`），提交一个只含该文件的 PR。
 4. 用户即可在市场搜索「团队控制台 / Team Console」，或命令行输入 `dsh plugin --profile web add dsh-team-console`。
 
 DSH 没有内置官方索引；社区目录生成的索引会被多个市场引用，也可以自己托管一份 JSON 索引并在市场「发现」页添加 URL。仅本地开发时才需要 `node install.mjs` 的 `link:` 方式。
@@ -242,14 +244,31 @@ DSH 没有内置官方索引；社区目录生成的索引会被多个市场引�
 改完样式或组件后跑这四条，全绿再提交：
 
 ```
-node tools/build-css.mjs      # 把 tmp-css.txt 注入 lib/client.js 并重生成 public/style.css
-node tools/build-css.mjs --check   # 校验双端 CSS 是否同步（退出码 0）
-node tools/verify.mjs         # 41 项验收：语法 / CSS 同步 / 步骤说人话 / XSS / 左右方向 / 双端一致 / 边界参数
+node tools/build-css.mjs            # 把 tmp-css.txt 注入 lib/client.js 并重生成 public/style.css
+node tools/build-css.mjs --check    # 校验双端 CSS 是否同步（退出码 0）
+node tools/verify.mjs               # 71 项验收：语法 / CSS 同步 / 步骤说人话 / XSS / 左右方向 / 双端一致 / 边界参数
+npm test                            # smoke + regression 回归（内部也会跑 verify 与 build-css --check）
 ```
 
 `verify.mjs` 会用 React 桩渲染面板端、用 DOM 桩渲染独立端，并用 `<img onerror>` 探针检查转义。
 
 ## 变更记录
+
+### 0.9.5 — 安全与健壮性修复
+
+以安全、并发与异常路径为主的一轮修复（不新增依赖，双端行为保持一致）：
+
+- **CORS 收紧**：只对回环 Origin 回显 `Access-Control-Allow-Origin`，任意网站不再能跨源读取本机会话数据；同时严格校验 Host 头与 HTTP 方法。
+- **端口/配置校验**：非法 port / sessionsRoot / maxAgeDays 走显式回退或启动期报错；`port: 0` 由系统分配后回写真实端口；插件启动失败不再把异常抛给宿主。
+- **增量读取**：只读取上次之后的**新增字节**（纯文本与 zstd 都不再整文件读），源字节缓存超出预算时淘汰旧缓存，避免长会话下内存与磁盘 IO 膨胀。
+- **成员 stale 标记**：成员超过 10 分钟无新事件时活动标签显示「（10 分钟无新事件）」并视为非活跃；session-tree 兜底路径的阶段同步改为 inactive。
+- **任务板一致性**：依赖的任务被删除后，pending 任务恢复 ready 并标注「（已删除）」；团队列表按 lead 去重；非团队会话返回 404。
+- **缓存隔离**：sync 扫描先执行时不再污染 async 的 session-tree 兜底结果；`gzip;q=0` 的客户端不再收到 gzip 响应。
+- **启动器诊断**：端口被其它程序占用时提示换端口并退出 2，已有实例在跑时直接给出地址退出 0。
+- **面板健壮性**：断连状态可见、切换团队时选择器刷新、轮询同一时刻只跑一轮且请求 8s 超时放弃（不会堆叠请求）。
+- **安装器**：`install.mjs` 现在同时注册 `dsh.profile.bundles`（修复装完 DSH 不加载插件的问题），并补上参数校验、原子写入与失败回滚。
+
+验收：`node tools/verify.mjs` 71 项 + `node test/regression.mjs` 13 项全绿。
 
 ### 0.9.4 — 聊天记录真正渲染 Markdown（两端）
 

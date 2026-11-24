@@ -3,7 +3,11 @@
   var API_PORTS = [];
   for (var p = 4318; p < 4338; p += 1) API_PORTS.push(p);
   var POLL_MS = 2500;
+  /* B3：数据请求超时；同时保证同一时刻只有一轮拉取（见 tick 的 inFlight 守卫）。 */
+  var DATA_TIMEOUT_MS = 8000;
   var requestSeq = 0;
+  var inFlight = false;
+  var rerunPending = false;
   /* 允许用 ?api=4320 或 ?api=http://127.0.0.1:4320 指定数据服务（示例演示 / 多实例排查用）。 */
   var API_OVERRIDE = (function () {
     var match = /[?&]api=([^&]+)/.exec(location.search || "");
@@ -438,7 +442,7 @@
     if (!text) return "?";
     if (/^[\u4e00-\u9fa5]/.test(text)) return text.charAt(0);
     var parts = text.replace(/[^a-zA-Z0-9]+/g, " ").trim().split(" ").filter(Boolean);
-    if (parts.length === 0) return text.slice(0, 1).toUpperCase();
+    if (parts.length === 0) return (Array.from(text)[0] || "?").toUpperCase();
     if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
     return (parts[0][0] + parts[1][0]).toUpperCase();
   }
@@ -655,7 +659,8 @@
       "</div>";
     }
     return '<div class="dtc-task" data-task="' + esc(task.id) + '" data-owner="' + esc(task.ownerId || "") + '" title="' + (task.ownerId ? "查看负责人对话" : "展开任务详情") + '">' +
-      '<div class="dtc-taskMain"><span class="dtc-dot ' + st.dot + '"></span>' +
+      /* 键盘可达性放 .dtc-taskMain（▾ 按钮的兄弟节点），避免 role="button" 包裹真实 button；点击整行仍由外层委托处理。 */
+      '<div class="dtc-taskMain" role="button" tabindex="0"><span class="dtc-dot ' + st.dot + '"></span>' +
         '<span class="dtc-id">' + esc(task.id) + "</span>" +
         '<span class="dtc-taskSubject">' + esc(task.subject || "(无标题)") + "</span></div>" +
       '<div class="dtc-taskSide">' +
@@ -1071,7 +1076,8 @@
   }
 
   function renderTeams() {
-    var signature = state.teams.map(function (item) { return item.leadId; }).join(",");
+    /* B2：签名必须覆盖真正渲染的四个字段，否则团队标题 / 人数变化时下拉永久冻结。 */
+    var signature = state.teams.map(function (item) { return [item.leadId, item.title, item.memberCount, item.openTaskCount].join("\u0001"); }).join("\u0002");
     if (nodes.teamSelect.getAttribute("data-signature") === signature) {
       nodes.teamSelect.value = state.leadId || "";
       return;
@@ -1084,6 +1090,10 @@
   }
 
   async function tick() {
+    /* B3：同一时刻只允许一轮拉取；期间被再次触发就记一个待跑标记，本轮结束后补跑。
+       同时推进序号，让在途的旧 tick 丢弃自身，避免把用户刚切换的 selected / transcript 回滚成旧值。 */
+    if (inFlight) { rerunPending = true; requestSeq += 1; return; }
+    inFlight = true;
     var seq = (requestSeq += 1);
     try {
       if (!state.api) {
@@ -1092,7 +1102,7 @@
         state.api = found;
         if (!state.api) { state.error = "没有找到本地数据服务"; render(); return; }
       }
-      var teamsResponse = await getJson(state.api + "/api/teams");
+      var teamsResponse = await getJson(state.api + "/api/teams", DATA_TIMEOUT_MS);
       if (seq !== requestSeq) return;
       state.teams = teamsResponse.teams || [];
       state.error = null;
@@ -1101,7 +1111,7 @@
       }
       var keep = state.leadId && state.teams.some(function (item) { return item.leadId === state.leadId; });
       state.leadId = keep ? state.leadId : state.teams[0].leadId;
-      var teamResponse = await getJson(state.api + "/api/team?lead=" + encodeURIComponent(state.leadId));
+      var teamResponse = await getJson(state.api + "/api/team?lead=" + encodeURIComponent(state.leadId), DATA_TIMEOUT_MS);
       if (seq !== requestSeq) return;
       state.team = teamResponse.team;
       var exists = state.selected && (state.selected === state.leadId || state.selected === "__overview__" || state.team.members.some(function (member) { return member.id === state.selected; }));
@@ -1109,7 +1119,7 @@
 
       if (state.selected !== "__overview__") {
         try {
-          var transcriptResponse = await getJson(state.api + "/api/session/" + encodeURIComponent(state.selected) + "?limit=200");
+          var transcriptResponse = await getJson(state.api + "/api/session/" + encodeURIComponent(state.selected) + "?limit=200", DATA_TIMEOUT_MS);
           if (seq !== requestSeq) return;
           state.transcript = transcriptResponse.transcript;
         } catch (error) {
@@ -1126,6 +1136,9 @@
       if (error && !error.status) state.api = null;
       state.error = "读取失败：" + (error && error.message ? error.message : String(error));
       render();
+    } finally {
+      inFlight = false;
+      if (rerunPending) { rerunPending = false; tick(); }
     }
   }
 
@@ -1180,20 +1193,22 @@
     });
   }
 
-  nodes.tree.addEventListener("click", function (event) {
-    var detailBtn = event.target.closest("[data-detail]");
+  /* 名册 / 任务板的点击与键盘共用同一套命中逻辑（B7：任务行可键盘操作，不重复触发）。 */
+  function activateTreeTarget(target) {
+    if (!target || typeof target.closest !== "function") return;
+    var detailBtn = target.closest("[data-detail]");
     if (detailBtn) {
       var detailId = detailBtn.getAttribute("data-detail");
       state.expandedTask = state.expandedTask === detailId ? null : detailId;
       renderTree();
       return;
     }
-    var memberBtn = event.target.closest("[data-member]");
+    var memberBtn = target.closest("[data-member]");
     if (memberBtn) {
       selectTarget(memberBtn.getAttribute("data-member"));
       return;
     }
-    var taskCard = event.target.closest("[data-task]");
+    var taskCard = target.closest("[data-task]");
     if (taskCard) {
       var owner = taskCard.getAttribute("data-owner");
       if (owner) {
@@ -1205,7 +1220,7 @@
       renderTree();
       return;
     }
-    var reqHead = event.target.closest("[data-req]");
+    var reqHead = target.closest("[data-req]");
     if (reqHead) {
       var turn = Number(reqHead.getAttribute("data-req"));
       var requests = state.team ? buildRequests(state.team) : [];
@@ -1217,6 +1232,21 @@
       state.openTurns[turn] = !current;
       renderTree();
     }
+  }
+
+  nodes.tree.addEventListener("click", function (event) {
+    activateTreeTarget(event && event.target);
+  });
+
+  nodes.tree.addEventListener("keydown", function (event) {
+    if (!event || (event.key !== "Enter" && event.key !== " " && event.key !== "Spacebar")) return;
+    var target = event.target;
+    if (!target || typeof target.closest !== "function") return;
+    /* 内部真实 button（▾）的 Enter/Space 会自己产生 click，这里跳过避免双触发。 */
+    if (target.closest("button")) return;
+    if (!target.closest("[data-task]")) return;
+    event.preventDefault();
+    activateTreeTarget(target);
   });
 
   nodes.feed.addEventListener("scroll", function () {

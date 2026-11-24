@@ -14,7 +14,7 @@ const ROOT = path.resolve(HERE, "..");
 console.log("=== 1. 运行 build-css 校验 ===");
 execFileSync(process.execPath, [path.join(ROOT, "tools", "build-css.mjs"), "--check"], { stdio: "inherit" });
 
-console.log("\n=== 2. 运行 tools/verify.mjs (41 项测试) ===");
+console.log("\n=== 2. 运行 tools/verify.mjs（面板验收，项数以 verify 汇总为准） ===");
 execFileSync(process.execPath, [path.join(ROOT, "tools", "verify.mjs")], { stdio: "inherit" });
 
 console.log("\n=== 3. 验证关键功能点 ===");

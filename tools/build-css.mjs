@@ -41,6 +41,8 @@ function injectedClient(source) {
   return lines.join("\n");
 }
 
+export { VARS, standaloneCss, injectedClient };
+
 function main() {
   const checkOnly = process.argv.includes("--check");
   const source = fs.readFileSync(CSS_SOURCE, "utf8");
@@ -64,4 +66,5 @@ function main() {
   console.log("style.css     : " + (standaloneFresh ? "无变化" : "已更新"));
 }
 
-main();
+// 被 import 时（例如 tools/verify.mjs 的 EPERM 回退分支）不要执行 main。
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();

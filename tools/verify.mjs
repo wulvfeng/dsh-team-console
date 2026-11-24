@@ -16,7 +16,7 @@
 import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
@@ -49,15 +49,15 @@ for (const rel of ["lib/client.js", "public/app.js"]) {
 {
   const run = spawnSync(process.execPath, [path.join(ROOT, "tools", "build-css.mjs"), "--check"], { encoding: "utf8" });
   if (run.error && run.error.code === "EPERM") {
+    /* 受限环境禁止 spawn：直接 import 构建函数做逐字节严格比较。
+       （不能用 indexOf 子串包含：文件末尾被追加内容时它仍会误判为已同步。） */
+    const buildCss = await import(pathToFileURL(path.join(ROOT, "tools", "build-css.mjs")).href);
     const cssSrc = fs.readFileSync(path.join(ROOT, "tmp-css.txt"), "utf8");
     const clientSrc = fs.readFileSync(path.join(ROOT, "lib", "client.js"), "utf8");
     const styleSrc = fs.readFileSync(path.join(ROOT, "public", "style.css"), "utf8");
-    const hasClientCss = clientSrc.indexOf("    var CSS = " + JSON.stringify(cssSrc) + ";") !== -1;
-    const stripped = cssSrc.replace(/(\.dtc-root\{)([^}]*)(\})/, (m, o, b, c) =>
-      o + b.split(";").filter((d) => d.trim() && d.trim().indexOf("--dtc-") !== 0).join(";") + c
-    );
-    const hasStyleCss = styleSrc.indexOf(stripped) !== -1;
-    check("CSS 双端同步 (build-css --check)", hasClientCss && hasStyleCss, (hasClientCss ? "client:ok " : "client:stale ") + (hasStyleCss ? "style:ok" : "style:stale"));
+    const clientOk = clientSrc === buildCss.injectedClient(cssSrc);
+    const styleOk = styleSrc === buildCss.standaloneCss(cssSrc);
+    check("CSS 双端同步 (build-css --check)", clientOk && styleOk, (clientOk ? "client:ok " : "client:stale ") + (styleOk ? "style:ok" : "style:stale"));
   } else {
     check("CSS 双端同步 (build-css --check)", run.status === 0, (run.stdout || "").replace(/\n/g, " ").trim());
   }
@@ -194,7 +194,11 @@ check("独立端：有内容", feedHtml.length > 200, "长度 " + feedHtml.lengt
 check("独立端：XSS 已转义（含 &lt;img）", feedHtml.indexOf("&lt;img") !== -1);
 check("独立端：无裸 <img", feedHtml.indexOf("<img") === -1);
 check("独立端：无 <script", feedHtml.indexOf("<script") === -1);
-check("独立端：onerror 未逃逸", feedHtml.indexOf("onerror=") === -1 || feedHtml.indexOf("&quot;") !== -1);
+/* 只查“裸标签上的事件属性”：先按标签切分，再剔掉引号内的文本，
+   避免把安全转义文本（如 title="&lt;img ... onerror=&quot;"）误判为危险属性。 */
+const hasUnsafeHandler = (html) => [...html.matchAll(/<[a-z][^>]*>/gi)]
+  .some((m) => /\son\w+\s*=/i.test(m[0].replace(/"[^"]*"|'[^']*'/g, "")));
+check("独立端：onerror 未逃逸", !hasUnsafeHandler(feedHtml));
 const stepHtmlMatches = [...feedHtml.matchAll(/<div class="dtc-stepTitle"[^>]*>([\s\S]*?)<\/div>/g)].map((m) => m[1]);
 const standaloneStepText = stepHtmlMatches.join(" || ");
 check("独立端：步骤 3 条", stepHtmlMatches.length === 3, "实际 " + stepHtmlMatches.length);
