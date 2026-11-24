@@ -6,11 +6,11 @@
   "icon": "./icon.svg",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wulvlv666/dsh-team-console.git"
+    "url": "https://github.com/wulvfeng/dsh-team-console.git"
   },
-  "homepage": "https://github.com/wulvlv666/dsh-team-console#readme",
+  "homepage": "https://github.com/wulvfeng/dsh-team-console#readme",
   "bugs": {
-    "url": "https://github.com/wulvlv666/dsh-team-console/issues"
+    "url": "https://github.com/wulvfeng/dsh-team-console/issues"
   },
   "type": "module",
   "main": "lib/index.js",

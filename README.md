@@ -19,7 +19,7 @@ dsh plugin --profile web add dsh-team-console
 也可以从 GitHub 源码安装（仓库已提交构建产物，无需放行构建脚本）：
 
 ```bash
-dsh plugin --profile web add github:wulvlv666/dsh-team-console
+dsh plugin --profile web add github:wulvfeng/dsh-team-console
 ```
 
 验证：`dsh plugin --profile web list` 应列出 `dsh-team-console`。
@@ -214,7 +214,7 @@ dsh-team-console/
 
 1. 推送 GitHub 仓库后，在仓库页面添加 topic `dsh-plugin`。
 2. `npm login` 后执行 `npm publish --access public`（包名 `dsh-team-console`；后续改代码先用 `npm version patch` 递增版本，npm 不允许覆盖已发布版本）。
-3. 满足社区目录的仓库年龄要求（当前约 1 天）后，fork `awesome-dsh-plugin/awesome-dsh-plugin`，新增 `data/plugins/wulvlv666__dsh-team-console.yml`（模板已放在本仓库 `community/data/plugins/`），提交一个只含该文件的 PR。
+3. 满足社区目录的仓库年龄要求（当前约 1 天）后，fork `awesome-dsh-plugin/awesome-dsh-plugin`，新增 `data/plugins/wulvfeng__dsh-team-console.yml`（模板已放在本仓库 `community/data/plugins/`），提交一个只含该文件的 PR。
 4. 用户即可在市场搜索「团队控制台 / Team Console」，或命令行输入 `dsh plugin --profile web add dsh-team-console`。
 
 DSH 没有内置官方索引；社区目录生成的索引会被多个市场引用，也可以自己托管一份 JSON 索引并在市场「发现」页添加 URL。仅本地开发时才需要 `node install.mjs` 的 `link:` 方式。
