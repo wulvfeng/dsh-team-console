@@ -899,7 +899,7 @@
     setHtml(nodes.sectBar, '<div class="dtc-sectBar dtc-guide"><b>' + (isOverview ? "协同链路与实时动态" : "完整聊天记录") + '</b>' +
       (visibleCount > 0 ? '<span class="dtc-sectNum">' + visibleCount + "</span>" : "") +
       '<span class="dtc-guideText">' +
-        '<span class="dtc-guideItem"><span class="dtc-guideNo">①</span>我给他的任务（左）</span>' +
+        '<span class="dtc-guideItem"><span class="dtc-guideNo">①</span>收到的任务（左）</span>' +
         '<span class="dtc-guideItem"><span class="dtc-guideNo">②</span>他的执行过程（中间）</span>' +
         '<span class="dtc-guideItem"><span class="dtc-guideNo">③</span>他的回复（右）</span>' +
       "</span></div>");
@@ -1010,11 +1010,18 @@
       var time = clock(block.item.time);
       var chips = block.steps && block.steps.length ? stepListHtml(block) : "";
       var bodyHtml = formatRichText(block.item.text);
+      /* 同面板端：成员会话里的任务书来自 Lead（或转达的 Agent），不是浏览器用户本人。 */
+      var sender = block.item && block.item.sender ? block.item.sender : null;
+      var mineLabel = (sender && sender.name) || (isLead ? "用户" : "Lead 主控");
+      var mineAvatar = sender && sender.kind === "human" ? "我" : (sender && sender.kind === "lead" ? "主" : initials(mineLabel));
+      var mineTag = sender
+        ? (sender.relay ? "转达" : (sender.kind === "lead" ? "任务书" : ""))
+        : (isLead ? "" : "任务书");
       return '<div class="dtc-talk ' + (isMine ? "out" : "in") + ' dtc-feedMsg">' +
         '<span class="dtc-talkAvatar" style="' + (isMine ? "background:linear-gradient(135deg,#4f46e5,#7c3aed)" : avatarStyle(roleName)) + '">' +
-          esc(isMine ? "我" : initials(roleName)) + "</span>" +
-        '<div class="dtc-talkBody"><div class="dtc-talkLabel"><b>' + esc(isMine ? (isLead ? "用户" : "我") : roleName) + "</b>" +
-          (isMine && !isLead ? '<span class="dtc-roleTag">任务书</span>' : "") +
+          esc(isMine ? mineAvatar : initials(roleName)) + "</span>" +
+        '<div class="dtc-talkBody"><div class="dtc-talkLabel"><b>' + esc(isMine ? mineLabel : roleName) + "</b>" +
+          (isMine && mineTag ? '<span class="dtc-roleTag">' + mineTag + '</span>' : "") +
           (!isMine && block.isFinal ? '<span class="dtc-roleTag reply">回复</span>' : "") +
           "<span>" + time + "</span></div>" +
         '<div class="dtc-bubble ' + (isMine ? "out" : "in") + ' dtc-md">' + bodyHtml + "</div>" + chips +

@@ -84,7 +84,7 @@ const team = {
 const transcript = {
   sessionId: "m-1", label: PAYLOAD, model: "test-model", total: 6, activity: { label: "活跃" },
   items: [
-    { id: "i1", kind: "user", time: T(-40000), text: "TASK-PROMPT " + PAYLOAD },
+    { id: "i1", kind: "user", time: T(-40000), sender: { kind: "lead", name: "Lead 主控" }, text: "TASK-PROMPT " + PAYLOAD },
     { id: "i2", kind: "reasoning", time: T(-39000), text: "think " + PAYLOAD },
     { id: "i3", kind: "tool", time: T(-38000), resultTime: T(-36500), name: "pwsh", args: '{"command":"Get-Process -Name node"}', headline: PAYLOAD, result: "ok" },
     { id: "i4", kind: "tool", time: T(-36000), resultTime: T(-35500), name: "glob", args: '{"pattern":"**/*.ts","path":"src"}', headline: "src", result: "3 files" },
@@ -191,6 +191,7 @@ await new Promise((r) => setTimeout(r, 600));
 const feedHtml = String((elements.get("feed") || {}).innerHTML || "");
 
 check("独立端：有内容", feedHtml.length > 200, "长度 " + feedHtml.length);
+check("独立端：任务书发送者标为 Lead 主控", feedHtml.indexOf("Lead 主控") !== -1);
 check("独立端：XSS 已转义（含 &lt;img）", feedHtml.indexOf("&lt;img") !== -1);
 check("独立端：无裸 <img", feedHtml.indexOf("<img") === -1);
 check("独立端：无 <script", feedHtml.indexOf("<script") === -1);

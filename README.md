@@ -246,13 +246,24 @@ DSH 没有内置官方索引；社区目录生成的索引会被多个市场引�
 ```
 node tools/build-css.mjs            # 把 tmp-css.txt 注入 lib/client.js 并重生成 public/style.css
 node tools/build-css.mjs --check    # 校验双端 CSS 是否同步（退出码 0）
-node tools/verify.mjs               # 71 项验收：语法 / CSS 同步 / 步骤说人话 / XSS / 左右方向 / 双端一致 / 边界参数
+node tools/verify.mjs               # 72 项验收：语法 / CSS 同步 / 步骤说人话 / XSS / 左右方向 / 双端一致 / 边界参数
 npm test                            # smoke + regression 回归（内部也会跑 verify 与 build-css --check）
 ```
 
 `verify.mjs` 会用 React 桩渲染面板端、用 DOM 桩渲染独立端，并用 `<img onerror>` 探针检查转义。
 
 ## 变更记录
+
+### 0.9.6 — 会话流发送者归属修正
+
+之前成员的会话流里，Lead 派发的任务书会被标成「我」，看起来像浏览器用户本人发的；后台任务完成通知也被当成用户消息。现在按日志来源区分：
+
+- **成员会话**：普通 `user` 消息归属 **Lead 主控**（头像「主」，标签「任务书」）；`agent-message` 转达消息显示发送 Agent 名（如 `worker-2`），剥离「Agent X sent a message:」前缀并标注「转达」。
+- **Lead 会话**：真人输入仍标「用户」，不再出现「我」。
+- **后台任务通知**（`tool-jobs`）不再冒充用户消息，渲染为「系统 · …」事件行。
+- 导读栏「①我给他的任务」改为「①收到的任务」，避免在成员会话里误导。
+
+验收：`node tools/verify.mjs` 72 项 + `node test/regression.mjs` 14 项全绿。
 
 ### 0.9.5 — 安全与健壮性修复
 

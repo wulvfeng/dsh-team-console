@@ -1,6 +1,6 @@
 {
   "name": "dsh-team-console",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "description": "DSH Agent Teams 只读监控面板：左侧栏「团队」入口，自动展示成员状态、共享任务板，以及每个成员的会话流（消息 / 工具调用 / 结果）。Host 插件 + Web 客户端插件，随包发布。",
   "license": "MIT",
   "icon": "./icon.svg",

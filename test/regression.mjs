@@ -518,6 +518,52 @@ try {
     assert.equal(asyncTeams[0].source, "session-tree");
   });
 
+  // 14. 会话流发送者归属：成员会话的 user 消息属于 Lead/转达 Agent，后台任务是系统事件
+  await test("sessionTranscript: 成员会话消息归属 Lead/转达 Agent，tool-jobs 归系统事件", () => {
+    const root = path.join(tmpRoot, "sender-root");
+    const ws = path.join(root, "ws");
+    const now = Date.now();
+    const write = (dirName, lines) => {
+      const dir = path.join(ws, dirName);
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, "session.v4.jsonl"), lines.map((l) => JSON.stringify(l)).join("\n") + "\n");
+    };
+    write("member-1", [
+      { type: "session", version: 4, id: "member-1", parentSession: "session-lead-sender", origin: "subagent", delegationDepth: 1, createdAt: now - 5000, cwd: "C:/p" },
+      { type: "user/message", seq: 1, time: now - 4900, data: { content: [{ type: "text", text: "TASK-FROM-LEAD" }], source: { kind: "user" } } },
+      { type: "user/message", seq: 2, time: now - 4800, data: { content: [{ type: "text", text: "Agent worker-2 sent a message: HELLO-RELAY" }], source: { kind: "agent-message", form: "relay", senderSessionId: "member-2" } } },
+      { type: "user/message", seq: 3, time: now - 4700, data: { content: [{ type: "text", text: "background job pwsh-1 finished [status: completed, exit code: 0]" }], source: { kind: "tool-jobs", form: "notice" } } },
+      { type: "assistant/message", seq: 4, time: now - 4600, data: { message: { content: [{ type: "text", text: "DONE" }] } } }
+    ]);
+    write("session-lead-sender", [
+      { type: "session", version: 4, id: "session-lead-sender", createdAt: now - 9000, cwd: "C:/p" },
+      { type: "user/message", seq: 1, time: now - 8000, data: { content: [{ type: "text", text: "HUMAN-INPUT" }], source: { kind: "user" } } }
+    ]);
+
+    const member = sessionTranscript({ sessionsRoot: root, sessionId: "member-1" });
+    assert.equal(member.kind, "member");
+    const users = member.items.filter((it) => it.kind === "user");
+    assert.equal(users.length, 2);
+    assert.equal(users[0].text, "TASK-FROM-LEAD");
+    assert.equal(users[0].sender.kind, "lead");
+    assert.equal(users[0].sender.name, "Lead 主控");
+    assert.equal(users[0].sender.relay, undefined, "任务书不是转达消息");
+    assert.equal(users[1].text, "HELLO-RELAY", "转达前缀应被剥离");
+    assert.equal(users[1].sender.kind, "agent");
+    assert.equal(users[1].sender.name, "worker-2");
+    assert.equal(users[1].sender.relay, true);
+    const notices = member.items.filter((it) => it.kind === "team");
+    assert.equal(notices.length, 1, "后台任务通知应渲染成系统事件");
+    assert.equal(notices[0].text.indexOf("系统 ·"), 0);
+    assert.ok(notices[0].text.indexOf("background job") !== -1);
+
+    const lead = sessionTranscript({ sessionsRoot: root, sessionId: "session-lead-sender" });
+    const leadUsers = lead.items.filter((it) => it.kind === "user");
+    assert.equal(leadUsers.length, 1);
+    assert.equal(leadUsers[0].sender.kind, "human");
+    assert.equal(leadUsers[0].sender.name, "用户");
+  });
+
   console.log("\n回归测试全部通过（" + passed + " 项）");
 } finally {
   fs.rmSync(tmpRoot, { recursive: true, force: true });
